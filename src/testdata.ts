@@ -2,51 +2,18 @@
 import type { Instrument } from "@sauber/trading-account";
 import { nanoid } from "nanoid";
 import { plot } from "asciichart";
-
-/** Box-Muller Normal Distribution Between 0 and 1 */
-function randn_bm(): number {
-  let u = 0,
-    v = 0;
-  while (u === 0) u = Math.random(); //Converting [0,1) to (0,1)
-  while (v === 0) v = Math.random();
-  let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-  num = num / 10.0 + 0.5; // Translate to 0 -> 1
-  if (num > 1 || num < 0) return randn_bm(); // resample between 0 and 1
-  return num;
-}
+import { downsample, randn } from "@sauber/statistics";
 
 /** Generate a random chart */
 function randomChart(count: number): number[] {
   const chart: number[] = [];
   let price = 1000 * Math.random();
   for (let i = 0; i < count; i++) {
-    const change = (randn_bm() - 0.5) / 5;
+    const change = (randn() - 0.5) / 5;
     price *= 1 + change;
     chart.push(parseFloat(price.toFixed(4)));
   }
   return chart;
-}
-
-/** Average samples from array */
-function resample(data: number[], count: number): number[] {
-  // No resample if too little data
-  if (count >= data.length) return data;
-
-  // Average of numbers
-  const average = (arr: number[]) =>
-    arr.reduce((p: number, c: number) => p + c, 0) / arr.length;
-
-  // Downsample buckets
-  const output: number[] = [];
-  const bucketSize = data.length / count;
-  for (let i = 1; i <= count; ++i) {
-    const bucket: number[] = data.slice(
-      Math.floor((i - 1) * bucketSize),
-      Math.ceil(i * bucketSize)
-    );
-    output.push(average(bucket));
-  }
-  return output;
 }
 
 /** An instrument with a random symbol and random price */
@@ -73,7 +40,7 @@ export class RandomInstrument implements Instrument {
 
   public plot(height: number = 15, width: number = 78): string {
     height -= 2;
-    const chart = resample(this.chart, width - 7);
+    const chart = downsample(this.chart, width - 7);
     const padding = "       ";
     return "[ " + this.symbol + " ]\n" + plot(chart, { height, padding });
   }
