@@ -53,7 +53,10 @@ export class Strategy {
     if (this.instruments) {
       // Create equal position in each investor
       const amount: number = this.getAmount() / this.instruments.length;
-      return this.instruments.map((instrument: Instrument) => ({ amount, instrument }));
+      return this.instruments.map((instrument: Instrument) => ({
+        amount,
+        instrument,
+      }));
     } else if (this.parent) return this.parent.buy();
     else return [];
   }
@@ -82,9 +85,12 @@ export class Strategy {
       parent: this,
       buy: (): Portfolio =>
         Math.random() < 0.5
-          ? any(this.getBuy()).map((p) => ({ amount, instrument: p.instrument }))
+          ? any(this.getBuy()).map((p) => ({
+              amount,
+              instrument: p.instrument,
+            }))
           : [],
-      sell: (): Portfolio => Math.random() > 0.5 ? any(this.getSell()) : [],
+      sell: (): Portfolio => (Math.random() > 0.5 ? any(this.getSell()) : []),
     });
   }
 
@@ -130,5 +136,16 @@ export class LimitStrategy extends Strategy {
 
   public override sell(): Portfolio {
     return this.getSell().slice(0, this.count);
+  }
+}
+
+/** Buy nothing, sell nothing */
+export class NullStrategy extends Strategy {
+  public override buy(): Portfolio {
+    return [];
+  }
+
+  public override sell(): Portfolio {
+    return [];
   }
 }

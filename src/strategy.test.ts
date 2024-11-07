@@ -3,7 +3,7 @@ import {
   assertEquals,
   assertInstanceOf,
 } from "@std/assert";
-import { LimitStrategy, Strategy } from "./strategy.ts";
+import { LimitStrategy, NullStrategy, Strategy } from "./strategy.ts";
 import { RandomInstrument } from "./testdata.ts";
 
 const active = [ new RandomInstrument, new RandomInstrument];
@@ -41,6 +41,12 @@ Deno.test("Random Strategy", () => {
 
 Deno.test("Limit Strategy", () => {
   const s = new LimitStrategy(5);
+  assertEquals(s.buy(), []);
+  assertEquals(s.sell(), []);
+});
+
+Deno.test("Null Strategy", () => {
+  const s = new NullStrategy();
   assertEquals(s.buy(), []);
   assertEquals(s.sell(), []);
 });
