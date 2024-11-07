@@ -1,0 +1,10 @@
+{
+  "name": "@sauber/trading-backtest",
+  "version": "0.0.1",
+  "exports": "./mod.ts",
+  "lock": false,
+  "publish": {
+    "exclude": ["src/*.test.ts"],
+    "include": ["LICENSE", "README.md", "mod.ts", "example.ts", "src/*.ts"]
+  }
+}
