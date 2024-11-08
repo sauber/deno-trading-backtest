@@ -1,4 +1,4 @@
-import type { Instrument } from "./instrument.ts";
+import type { Instrument } from "./types.ts";
 import { TestInstrument } from "./testdata.ts";
 import { Position } from "./position.ts";
 

@@ -17,6 +17,62 @@ function randomChart(count: number): number[] {
   return chart;
 }
 
+/** Make up a business name from an acronym */
+function makeName(symbol: string): string {
+  const words = `Head Heart Hands 
+American Consultants League Civil Liberties Union Association for 
+Commuter Transportation Amyotrophic Lateral Sclerosis Writers and 
+Artists Institute Better Business Bureau Council of Actions United 
+Service Efforts Conference of Minority Public Administrators Direct 
+Marketing Educational Foundation United States Environmental Protection 
+Agency Federal Emergency Management Home School Legal Defense Housing 
+and Urban Development International Atomic Energy Crime Police 
+Organization Olympic Committee Internal Revenue Service Standardization
+National  of Broadcast Employees Technicians National Aeronautics Space 
+Administration North Atlantic Treaty National Rifle of the Petroleum 
+Exporting Countries Occupational Safety Health Transport Elderly 
+Disabled Persons United Nations Childrens Fund World Health World 
+Wildlife Young Mens Christian The Minnesota Mining Manufacturing 
+Company Allen Wright Telephone Telegraph Bavarian Motor Works Bradley 
+Voorhees Day Consumer Value Stores Government Insurance Sports 
+Programming Network Experimental Prototype Community of Tomorrow Henry 
+Richard Block Hennes Mauritz Hongkong Shanghai Banking Corporation
+Machines James Bullough Lansing Leon Leonwood Bean Mars Murries Makeup 
+Art Cosmetics National Broadcasting Cooking Spray Product of Arthur 
+Meyer Non-Expandable Recreational Foam Recreational Equipment Shoulder 
+of Pork Ham Thomas Swift Electric Rifle The Countrys Best Yogurt Thank 
+God Its Fridays United Parcel Service Water Displacement formula World 
+Wrestling Entertainment Yet Another Hierarchical Officious Oracle 
+Yoshida Manufacturing Kit Kat Kind King Karen Kidz Key Kwik Quick Quay 
+Queen Quest Xero Xtra Zebra Zimmer Zero Zip Zig Zag Zac Java Jelly Just 
+Jet Jura Juicy
+  `;
+
+  const d: Record<string, Set<string>> = {};
+  const sorted = words.match(/\b(\w+)\b/g)?.sort();
+  console.log({sorted});
+  for (const word of words.match(/\b(\w+)\b/g)) {
+    const letter: string = word.charAt(0).toUpperCase();
+    if (!(letter in d)) d[letter] = new Set();
+    d[letter].add(word);
+  }
+
+  const name = symbol
+    .split("")
+    .filter((char) => char.toUpperCase() != char.toLowerCase())
+    .map((char) => {
+      const s: Set<string> = d[char.toUpperCase()];
+      const words = Array.from(s);
+      const index = Math.floor(words.length * Math.random());
+      const word = words[index];
+      // console.log(char, s, index, word);
+      return word;
+    })
+    .join(" ");
+
+  return name;
+}
+
 /** An instrument with a random symbol and random price */
 export class TestInstrument implements Instrument {
   public readonly symbol: string = nanoid(4).toUpperCase();
