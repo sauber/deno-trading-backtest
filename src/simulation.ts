@@ -1,6 +1,7 @@
-import { Account } from "@sauber/trading-account";
+import { Account } from "./account.ts";
 import type { Market } from "./market.ts";
-import { type Portfolio, Strategy } from "./strategy.ts";
+import type { Portfolio } from "./portfolio.ts";
+import { Strategy } from "./strategy.ts";
 
 type Performance = {
   steps: number;

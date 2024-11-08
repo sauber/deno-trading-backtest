@@ -1,6 +1,6 @@
-import { assertInstanceOf } from "@std/assert";
+import { assertInstanceOf, assertLess } from "@std/assert";
 import { type Instruments, Market } from "./market.ts";
-import { RandomInstrument } from "./testdata.ts";
+import { TestInstrument } from "./testdata.ts";
 
 Deno.test("Instance", () => {
   const market = new Market([]);
@@ -8,13 +8,9 @@ Deno.test("Instance", () => {
 });
 
 Deno.test("Dates", () => {
-  const i: Instruments = [ new RandomInstrument, new RandomInstrument];
+  const i: Instruments = [ new TestInstrument, new TestInstrument];
   const market = new Market(i);
-  console.log(market.start, market.end);
+  // console.log(market.start, market.end);
+  assertLess(market.start, market.end)
 });
 
-Deno.test("Dates", () => {
-  const i: Instruments = [ new RandomInstrument, new RandomInstrument];
-  const market = new Market(i);
-  console.log(market.start, market.end);
-});

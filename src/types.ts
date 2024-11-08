@@ -1,12 +1,13 @@
+/** An instrument tradeable on exchange */
 export interface Instrument {
   // Name of instrument
-  symbol: string;
+  readonly symbol: string;
 
   // First time when chart data is available
-  start: Date;
+  readonly start: Date;
 
   // Last time when chart data is available
-  end: Date;
+  readonly end: Date;
 
   // Does instrument have price information at time
   active: (time: Date) => boolean;
@@ -14,3 +15,6 @@ export interface Instrument {
   // Price of instrument at time
   price: (time: Date) => number;
 }
+
+/** A list of instruments */
+export type Instruments = Array<Instrument>;

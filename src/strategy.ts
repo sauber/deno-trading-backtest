@@ -1,13 +1,15 @@
-import { Instrument } from "@sauber/trading-account";
+import { Portfolio } from "./portfolio.ts";
+import { Position } from "./position.ts";
+import type { Instrument } from "./types.ts";
 
 type Instruments = Array<Instrument>;
 
-export type Position = {
-  amount: number;
-  instrument: Instrument;
-};
+// export type Position = {
+//   amount: number;
+//   instrument: Instrument;
+// };
 
-export type Portfolio = Array<Position>;
+// export type Portfolio = Array<Position>;
 
 /** Pick a random item from an array */
 function any<T>(items: Array<T>): Array<T> {
@@ -53,12 +55,16 @@ export class Strategy {
     if (this.instruments) {
       // Create equal position in each investor
       const amount: number = this.getAmount() / this.instruments.length;
-      return this.instruments.map((instrument: Instrument) => ({
-        amount,
-        instrument,
-      }));
+      const time: Date = this.getTime();
+      const portfolio = new Portfolio(
+        this.instruments.map(
+          (i: Instrument) =>
+            new Position(i, amount / i.price(time), i.price(time))
+        )
+      );
+      return portfolio;
     } else if (this.parent) return this.parent.buy();
-    else return [];
+    else return new Portfolio();
   }
 
   public buy(): Portfolio {

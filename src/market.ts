@@ -1,7 +1,4 @@
-import type { Instrument } from "./types.ts";
-
-// A list of instruments
-export type Instruments = Array<Instrument>;
+import type { Instruments } from "./types.ts";
 
 // Compare two dates
 function sorttx(a: Date, b: Date): number {

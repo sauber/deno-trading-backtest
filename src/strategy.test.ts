@@ -4,9 +4,9 @@ import {
   assertInstanceOf,
 } from "@std/assert";
 import { LimitStrategy, NullStrategy, Strategy } from "./strategy.ts";
-import { RandomInstrument } from "./testdata.ts";
+import { TestInstrument } from "./testdata.ts";
 
-const active = [ new RandomInstrument, new RandomInstrument];
+const active = [ new TestInstrument, new TestInstrument];
 
 Deno.test("Strategy Instance", () => {
   const s = new Strategy();
