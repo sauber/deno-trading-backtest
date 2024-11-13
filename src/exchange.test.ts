@@ -25,11 +25,12 @@ Deno.test("Buy", () => {
 });
 
 Deno.test("Sell", () => {
+  const time = new Date();
   const ex = new Exchange();
   const instr: Instrument = makeInstrument();
   const buying = 1000;
-  const position: Position = ex.buy(instr, buying);
-  const selling = ex.sell(position);
+  const position: Position = ex.buy(instr, buying, time);
+  const selling = ex.sell(position, time);
   assertLess(selling / buying, 1.1 / 0.9);
   assertGreater(selling / buying, 0.9 / 1.1);
 });

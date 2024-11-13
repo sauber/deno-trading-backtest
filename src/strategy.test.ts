@@ -6,13 +6,13 @@ import {
 import { LimitStrategy, NullStrategy, Strategy } from "./strategy.ts";
 import { TestInstrument } from "./testdata.ts";
 
-const active = [ new TestInstrument, new TestInstrument];
+const active = [new TestInstrument(), new TestInstrument()];
 
 Deno.test("Strategy Instance", () => {
   const s = new Strategy();
   assertInstanceOf(s, Strategy);
-  assertEquals(s.buy().positions, []);
-  assertEquals(s.sell().positions, []);
+  assertEquals(s.buy(), []);
+  assertEquals(s.sell(), []);
 });
 
 Deno.test("Prepend", () => {
@@ -20,8 +20,8 @@ Deno.test("Prepend", () => {
   const parent = new Strategy();
   const chain = child.prepend(parent);
   assertEquals(chain, child);
-  assertEquals(chain.buy().positions, []);
-  assertEquals(chain.sell().positions, []);
+  assertEquals(chain.buy(), []);
+  assertEquals(chain.sell(), []);
 });
 
 Deno.test("Append", () => {
@@ -29,24 +29,24 @@ Deno.test("Append", () => {
   const parent = new Strategy();
   const chain = parent.append(child);
   assertEquals(chain, child);
-  assertEquals(chain.buy().positions, []);
-  assertEquals(chain.sell().positions, []);
+  assertEquals(chain.buy(), []);
+  assertEquals(chain.sell(), []);
 });
 
 Deno.test("Random Strategy", () => {
   const s = new Strategy({ instruments: active }).random();
   assertArrayIncludes([0, 1], [s.buy().length]);
-  assertEquals(s.sell().positions, []);
+  assertEquals(s.sell(), []);
 });
 
 Deno.test("Limit Strategy", () => {
   const s = new LimitStrategy(5);
-  assertEquals(s.buy().positions, []);
-  assertEquals(s.sell().positions, []);
+  assertEquals(s.buy(), []);
+  assertEquals(s.sell(), []);
 });
 
 Deno.test("Null Strategy", () => {
   const s = new NullStrategy();
-  assertEquals(s.buy().positions, []);
-  assertEquals(s.sell().positions, []);
+  assertEquals(s.buy(), []);
+  assertEquals(s.sell(), []);
 });

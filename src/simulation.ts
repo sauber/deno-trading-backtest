@@ -1,6 +1,6 @@
 import { Account } from "./account.ts";
 import type { Market } from "./market.ts";
-import type { Portfolio } from "./portfolio.ts";
+import type { Positions } from "./position.ts";
 import { Strategy } from "./strategy.ts";
 
 type Performance = {
@@ -22,8 +22,8 @@ export class Simulation {
 
   /** Buy all positions advised by strategy */
   private buy(strategy: Strategy): void {
-    const portfolio: Portfolio = strategy.sell();
-    for ( const position of portfolio.positions ) {
+    const positions: Positions = strategy.sell();
+    for (const position of positions) {
       this.account.add(position, position.invested);
       ++this.performance.buys;
     }

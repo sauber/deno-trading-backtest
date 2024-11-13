@@ -27,6 +27,7 @@ export class Account {
   public readonly portfolio: Portfolio = new Portfolio();
 
   /** Optionally deposit an amount at account opening */
+  // TODO: Provide exhange with free policy
   constructor(deposit: number = 0, time: Date = new Date()) {
     if (deposit != 0) this.deposit(deposit, time);
   }
@@ -69,6 +70,7 @@ export class Account {
   }
 
   /** Add position to portfolio, deduct payment from cash */
+  // TODO: Convert amount to position on exchange
   public add(
     position: Position,
     amount: number,
@@ -94,6 +96,7 @@ export class Account {
   }
 
   /** Remove position from portfolio, add return to cash */
+  // Get amount from exchange transaction
   public remove(
     position: Position,
     amount: number,
@@ -123,7 +126,7 @@ export class Account {
     return [...this.portfolio.positions];
   }
 
-  /** Value if positions and balance */
+  /** Combined value of positions and balance */
   public value(time: Date = new Date()): number {
     return this.balance + this.portfolio.value(time);
   }

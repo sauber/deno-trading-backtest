@@ -102,7 +102,9 @@ export class TestInstrument implements Instrument {
     height -= 2;
     const chart = downsample(this.chart, width - 7);
     const padding = "       ";
-    return "[ " + this.symbol + " ]\n" + plot(chart, { height, padding });
+    return (
+      `[ ${this.symbol} - ${this.name}]\n` + plot(chart, { height, padding })
+    );
   }
 }
 

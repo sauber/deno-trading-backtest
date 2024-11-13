@@ -1,5 +1,7 @@
 import type { Instrument } from "./types.ts";
 
+export type Positions = Array<Position>;
+
 export class Position {
   /**
    * @param instrument - Instrument of investment
