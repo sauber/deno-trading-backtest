@@ -73,7 +73,7 @@ export class Strategy {
 
   /** Sel whole portfolio or parent portfolio */
   protected getSell(): Portfolio {
-    return this.portfolio || this.parent?.portfolio || [];
+    return this.portfolio || this.parent?.portfolio || new Portfolio();
   }
 
   public sell(): Portfolio {
@@ -86,23 +86,20 @@ export class Strategy {
 
   /** Maybe buy or sell a position */
   public random(): Strategy {
-    const amount = this.getAmount();
+    // const amount = this.getAmount();
     return new Strategy({
       parent: this,
-      buy: (): Portfolio =>
+      buy: (): Portfolio => new Portfolio(
         Math.random() < 0.5
-          ? any(this.getBuy()).map((p) => ({
-              amount,
-              instrument: p.instrument,
-            }))
-          : [],
-      sell: (): Portfolio => (Math.random() > 0.5 ? any(this.getSell()) : []),
+          ? any(this.getBuy().positions)
+          : []),
+      sell: (): Portfolio => new Portfolio(Math.random() > 0.5 ? any(this.getSell().positions) : []),
     });
   }
 
   /** Buy nothing, sell all */
   public exit(): Strategy {
-    return new Strategy({ parent: this, buy: (): Portfolio => [] });
+    return new Strategy({ parent: this, buy: (): Portfolio => new Portfolio() });
   }
 
   /** Only buy active investors */
@@ -111,7 +108,7 @@ export class Strategy {
     return new Strategy({
       parent: this,
       buy: (): Portfolio =>
-        this.getBuy().filter((p) => p.instrument.active(date)),
+        new Portfolio(this.getBuy().positions.filter((p: Position) => p.instrument.active(date))),
     });
   }
 
@@ -121,7 +118,7 @@ export class Strategy {
     return new Strategy({
       parent: this,
       sell: (): Portfolio =>
-        this.getSell().filter((p) => !p.instrument.active(date)),
+        new Portfolio(this.getSell().positions.filter((p: Position) => !p.instrument.active(date))),
     });
   }
 }
@@ -137,21 +134,21 @@ export class LimitStrategy extends Strategy {
   }
 
   public override buy(): Portfolio {
-    return this.getBuy().slice(0, this.count);
+    return new Portfolio(this.getBuy().positions.slice(0, this.count));
   }
 
   public override sell(): Portfolio {
-    return this.getSell().slice(0, this.count);
+    return new Portfolio(this.getSell().positions.slice(0, this.count));
   }
 }
 
 /** Buy nothing, sell nothing */
 export class NullStrategy extends Strategy {
   public override buy(): Portfolio {
-    return [];
+    return new Portfolio();
   }
 
   public override sell(): Portfolio {
-    return [];
+    return new Portfolio;
   }
 }

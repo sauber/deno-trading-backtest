@@ -1,5 +1,6 @@
 import { assertInstanceOf, assertLess } from "@std/assert";
-import { type Instruments, Market } from "./market.ts";
+import type { Instruments } from "./types.ts";
+import { Market } from "./market.ts";
 import { TestInstrument } from "./testdata.ts";
 
 Deno.test("Instance", () => {

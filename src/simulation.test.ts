@@ -1,8 +1,9 @@
 import { assertEquals, assertInstanceOf } from "@std/assert";
 import { Simulation } from "./simulation.ts";
-import { type Instruments, Market } from "./market.ts";
+import { Market } from "./market.ts";
 import { TestInstrument } from "./testdata.ts";
 import { NullStrategy } from "./strategy.ts";
+import type { Instruments } from "./types.ts";
 
 // Create array from callback
 function repeat<T>(callback: () => T, count: number): Array<T> {

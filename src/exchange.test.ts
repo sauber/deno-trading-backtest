@@ -15,11 +15,12 @@ Deno.test("Instance", () => {
 });
 
 Deno.test("Buy", () => {
+  const time = new Date();
   const ex = new Exchange();
   const instr: Instrument = makeInstrument();
   const amount = 1000;
-  const position: Position = ex.buy(instr, amount);
-  console.log(position);
+  const position: Position = ex.buy(instr, amount, time);
+  // console.log(position);
   assertAlmostEquals(position.price * position.units, amount);
 });
 

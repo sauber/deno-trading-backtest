@@ -19,7 +19,7 @@ function randomChart(count: number): number[] {
 
 /** Make up a business name from an acronym */
 function makeName(symbol: string): string {
-  const words = `Head Heart Hands 
+  const text = `Head Heart Hands 
 American Consultants League Civil Liberties Union Association for 
 Commuter Transportation Amyotrophic Lateral Sclerosis Writers and 
 Artists Institute Better Business Bureau Council of Actions United 
@@ -49,9 +49,8 @@ Jet Jura Juicy
   `;
 
   const d: Record<string, Set<string>> = {};
-  const sorted = words.match(/\b(\w+)\b/g)?.sort();
-  console.log({sorted});
-  for (const word of words.match(/\b(\w+)\b/g)) {
+  const sorted = text.match(/\b(\w+)\b/g)?.sort() as string[];
+  for (const word of sorted) {
     const letter: string = word.charAt(0).toUpperCase();
     if (!(letter in d)) d[letter] = new Set();
     d[letter].add(word);
@@ -76,6 +75,7 @@ Jet Jura Juicy
 /** An instrument with a random symbol and random price */
 export class TestInstrument implements Instrument {
   public readonly symbol: string = nanoid(4).toUpperCase();
+  public readonly name: string = makeName(this.symbol);
   private readonly length: number = 700;
   private readonly chart: number[] = randomChart(this.length);
   public readonly end: Date = new Date();
@@ -87,6 +87,7 @@ export class TestInstrument implements Instrument {
   public price(time: Date): number {
     const diff = time.getTime() - this.start.getTime();
     const diffDays = Math.ceil(diff / (1000 * 3600 * 24));
+    // console.log("chart price on", time, {diffDays, chartlength: this.chart.length});
     const price = this.chart[diffDays];
     return price;
   }

@@ -22,9 +22,9 @@ export class Simulation {
 
   /** Buy all positions advised by strategy */
   private buy(strategy: Strategy): void {
-    const positions: Portfolio = strategy.sell();
-    for ( const position of positions ) {
-      this.account.add(position, position.amount);
+    const portfolio: Portfolio = strategy.sell();
+    for ( const position of portfolio.positions ) {
+      this.account.add(position, position.invested);
       ++this.performance.buys;
     }
   }

@@ -25,6 +25,7 @@ export class Exchange {
     const fee = amount * this.fee;
     const purchaseAmount = amount - fee;
     const units = purchaseAmount / exchangePrice;
+    // console.log({marketPrice, exchangePrice, fee, purchaseAmount, units});
     return new Position(instrument, units, exchangePrice);
   }
 
