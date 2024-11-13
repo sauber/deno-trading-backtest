@@ -9,6 +9,15 @@ function any<T>(items: Array<T>): Array<T> {
   return [items[index]];
 }
 
+/** Maybe true, may false */
+function maybe(): boolean {
+  return Math.random() < 0.5;
+}
+
+/** 
+ * A strategy decision which new positions to open and which existing positions to close.
+ * Strategies can be chained.
+ */
 export class Strategy {
   public readonly instruments?: Instruments;
   public readonly amount?: number;
@@ -50,15 +59,17 @@ export class Strategy {
     else return [];
   }
 
+  /** List of purchase orders from strategy */
   public buy(): PurchaseOrders {
     return this.getBuy();
   }
 
-  /** Sel whole portfolio or parent portfolio */
+  /** Sell these positions or positions of parent */
   protected getSell(): Positions {
     return this.positions || this.parent?.positions || [];
   }
 
+  /** List positions to sell according to strategy */
   public sell(): Positions {
     return this.getSell();
   }
@@ -72,9 +83,8 @@ export class Strategy {
     // const amount = this.getAmount();
     return new Strategy({
       parent: this,
-      buy: (): PurchaseOrders =>
-        Math.random() < 0.5 ? any(this.getBuy()) : [],
-      sell: (): Positions => (Math.random() > 0.5 ? any(this.getSell()) : []),
+      buy: (): PurchaseOrders => (maybe() ? any(this.getBuy()) : []),
+      sell: (): Positions => (maybe() ? any(this.getSell()) : []),
     });
   }
 
