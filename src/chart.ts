@@ -22,7 +22,7 @@ export class Chart {
 
   /** Look up value at index */
   public val(index: Index): Price {
-    if (this.has(index)) return this.series[index];
+    if (this.has(index)) return this.series[index-this.end];
     throw new Error(
       `Chart index ${index} is outside range ${this.start}->${this.end}.`
     );
