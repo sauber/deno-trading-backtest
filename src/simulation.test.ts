@@ -4,6 +4,7 @@ import { Market } from "./market.ts";
 import { TestInstrument } from "./testdata.ts";
 import { NullStrategy } from "./strategy.ts";
 import type { Instruments } from "./types.ts";
+import { Strategy } from "./strategy.ts";
 
 // Create array from callback
 function repeat<T>(callback: () => T, count: number): Array<T> {
@@ -42,4 +43,14 @@ Deno.test("Buying", () => {
   assertEquals(s.performance.steps, 0);
   s.run();
   assertEquals(s.performance.buys, 0);
+});
+
+Deno.test("Random Strategy", () => {
+  const market = makeMarket(10);
+  const s = new Simulation(market, new Strategy({amount: 1000}).random());
+  assertEquals(s.performance.steps, 0);
+  s.run();
+  const days: number = market.start - market.end;
+  assertEquals(s.performance.steps, days + 1);
+  console.log(s.account.statement);
 });

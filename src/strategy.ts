@@ -1,5 +1,11 @@
 import type { Position, Positions } from "./position.ts";
-import type { Amount, Index, Instruments, PurchaseOrder, PurchaseOrders } from "./types.ts";
+import type {
+  Amount,
+  Index,
+  Instruments,
+  PurchaseOrder,
+  PurchaseOrders,
+} from "./types.ts";
 
 /** Pick a random item from an array */
 function any<T>(items: Array<T>): Array<T> {
@@ -14,7 +20,7 @@ function maybe(): boolean {
   return Math.random() < 0.5;
 }
 
-/** 
+/**
  * A strategy decision which new positions to open and which existing positions to close.
  * Strategies can be chained.
  */
@@ -83,7 +89,13 @@ export class Strategy {
     // const amount = this.getAmount();
     return new Strategy({
       parent: this,
-      buy: (): PurchaseOrders => (maybe() ? any(this.getBuy()) : []),
+      buy: (): PurchaseOrders =>
+        maybe()
+          ? any(this.getBuy()).map((o) => ({
+              amount: this.getAmount(),
+              instrument: o.instrument,
+            }))
+          : [],
       sell: (): Positions => (maybe() ? any(this.getSell()) : []),
     });
   }
