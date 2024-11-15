@@ -1,4 +1,4 @@
-import type { Instrument } from "./types.ts";
+import type { Amount, Index, Instrument, Price } from "./types.ts";
 import { TestInstrument } from "./testdata.ts";
 import { Position } from "./position.ts";
 
@@ -18,22 +18,22 @@ export class Exchange {
   public buy(
     instrument: Instrument,
     amount: number,
-    time: Date = new Date()
+    index: Index = 0
   ): Position {
-    const marketPrice: number = instrument.price(time);
-    const exchangePrice: number = marketPrice * (1 + this.spread);
-    const fee = amount * this.fee;
-    const purchaseAmount = amount - fee;
+    const marketPrice: Price = instrument.price(index);
+    const exchangePrice: Price = marketPrice * (1 + this.spread);
+    const fee: Amount = amount * this.fee;
+    const purchaseAmount: Amount = amount - fee;
     const units = purchaseAmount / exchangePrice;
     // console.log({marketPrice, exchangePrice, fee, purchaseAmount, units});
     return new Position(instrument, units, exchangePrice);
   }
 
   /** Sell position for a fee at spread lower than price */
-  public sell(position: Position, time: Date = new Date()): number {
-    const value: number = position.value(time);
-    const amount = value * (1 - this.spread);
-    const fee = amount * this.fee;
+  public sell(position: Position, index: Index = 0): Amount {
+    const value: Amount = position.value(index);
+    const amount: Amount = value * (1 - this.spread);
+    const fee: Amount = amount * this.fee;
     return amount - fee;
   }
 }

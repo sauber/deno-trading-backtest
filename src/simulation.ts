@@ -2,6 +2,7 @@ import { Account } from "./account.ts";
 import type { Market } from "./market.ts";
 import type { Positions } from "./position.ts";
 import { Strategy } from "./strategy.ts";
+import type { Index } from "./types.ts";
 
 type Performance = {
   steps: number;
@@ -30,10 +31,10 @@ export class Simulation {
   }
 
   /** Perform one step of simulation */
-  private step(time: Date): void {
-    // console.log("step:", { time });
+  private step(index: Index): void {
+    // console.log("step:", { index });
     const today: Strategy = new Strategy({
-      instruments: this.market.on(time),
+      instruments: this.market.on(index),
     }).append(this.strategy);
     this.buy(today);
     ++this.performance.steps;
@@ -41,10 +42,12 @@ export class Simulation {
 
   /** Run steps of simulation from start to end */
   public run(): void {
-    const time = new Date(this.market.start);
-    while (time <= this.market.end) {
-      this.step(time);
-      time.setDate(time.getDate() + 1);
+    let index: Index = this.market.start;
+    // console.log("Simulation run start index:", index);
+    // this.step(index);
+    while (index >= this.market.end) {
+      this.step(index--);
+      // --index;
     }
   }
 }

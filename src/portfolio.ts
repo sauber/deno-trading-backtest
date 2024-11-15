@@ -1,5 +1,6 @@
 import { Table } from "@sauber/table";
 import type { Position } from "./position.ts";
+import { Amount, Index } from "./types.ts";
 
 /** A collection of instruments */
 export class Portfolio {
@@ -29,7 +30,7 @@ export class Portfolio {
   }
 
   /** Total amount invested in positions */
-  public get invested(): number {
+  public get invested(): Amount {
     return this.positions.reduce(
       (sum: number, p: Position) => sum + p.invested,
       0
@@ -37,17 +38,17 @@ export class Portfolio {
   }
 
   /** Total unrealized profit of all positions */
-  public profit(time: Date = new Date()): number {
+  public profit(index: Index = 0): number {
     return this.positions.reduce(
-      (sum: number, p: Position) => sum + p.profit(time),
+      (sum: number, p: Position) => sum + p.profit(index),
       0
     );
   }
 
   /** Total unrealized value of all positions */
-  public value(time: Date = new Date()): number {
+  public value(index: Index = 0): number {
     return this.positions.reduce(
-      (sum: number, p: Position) => sum + p.value(time),
+      (sum: number, p: Position) => sum + p.value(index),
       0
     );
   }
@@ -55,10 +56,9 @@ export class Portfolio {
   /** Printable statement */
   public get statement(): string {
     const money = (v: number): number => parseFloat(v.toFixed(2));
-    const now: Date = new Date();
+    // const now: Date = new Date();
     const t = new Table();
     t.headers = [
-      "Date",
       "Symbol",
       "Price",
       "Units",
@@ -70,7 +70,7 @@ export class Portfolio {
     let profit = 0;
     let value = 0;
     t.rows = this.positions.map((p) => {
-      const positionValue = p.value(now);
+      const positionValue = p.value();
 
       // Portfolio stats
       value += positionValue;
@@ -78,7 +78,6 @@ export class Portfolio {
       profit += positionValue - p.invested;
 
       return [
-        now.toLocaleDateString(),
         p.instrument.symbol,
         money(p.price),
         p.units.toFixed(4),

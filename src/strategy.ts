@@ -1,5 +1,5 @@
 import type { Position, Positions } from "./position.ts";
-import type { Instruments, PurchaseOrder, PurchaseOrders } from "./types.ts";
+import type { Amount, Index, Instruments, PurchaseOrder, PurchaseOrders } from "./types.ts";
 
 /** Pick a random item from an array */
 function any<T>(items: Array<T>): Array<T> {
@@ -20,8 +20,8 @@ function maybe(): boolean {
  */
 export class Strategy {
   public readonly instruments?: Instruments;
-  public readonly amount?: number;
-  public readonly time?: Date;
+  public readonly amount?: Amount;
+  public readonly index?: Index;
   public readonly positions?: Positions;
   public parent?: Strategy;
 
@@ -41,12 +41,12 @@ export class Strategy {
     return this;
   }
 
-  private getAmount(): number {
+  private getAmount(): Amount {
     return this.amount || this.parent?.amount || 0;
   }
 
-  private getTime(): Date {
-    return this.time || this.parent?.time || new Date();
+  private getIndex(): Index {
+    return this.index || this.parent?.index || 0;
   }
 
   /** Generate list of buy positions or pull from parent */
@@ -98,21 +98,21 @@ export class Strategy {
 
   /** Only buy active investors */
   public active(): Strategy {
-    const date = this.getTime();
+    const index: Index = this.getIndex();
     return new Strategy({
       parent: this,
       buy: (): PurchaseOrders =>
-        this.getBuy().filter((p: PurchaseOrder) => p.instrument.active(date)),
+        this.getBuy().filter((p: PurchaseOrder) => p.instrument.active(index)),
     });
   }
 
   /** Sell all expired investors */
   public expired(): Strategy {
-    const date = this.getTime();
+    const index: Index = this.getIndex();
     return new Strategy({
       parent: this,
       sell: (): Positions =>
-        this.getSell().filter((p: Position) => !p.instrument.active(date)),
+        this.getSell().filter((p: Position) => !p.instrument.active(index)),
     });
   }
 }

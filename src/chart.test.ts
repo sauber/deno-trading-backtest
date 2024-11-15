@@ -7,8 +7,8 @@ Deno.test("Instance", () => {
 
 Deno.test("Start/end", () => {
   const c = new Chart();
-  assertEquals(c.start, 0);
-  assertEquals(c.end, -1);
+  assertEquals(c.start, -1);
+  assertEquals(c.end, 0);
 });
 
 Deno.test("Values", () => {

@@ -32,9 +32,7 @@ Deno.test("Steps", () => {
   const s = new Simulation(market, new NullStrategy());
   assertEquals(s.performance.steps, 0);
   s.run();
-  const days: number = Math.floor(
-    (market.end.getTime() - market.start.getTime()) / (1000 * 3600 * 24)
-  );
+  const days: number = market.start - market.end;
   assertEquals(s.performance.steps, days + 1);
 });
 

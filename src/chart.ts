@@ -1,24 +1,30 @@
+import type { Index, Price } from "./types.ts";
+
 /**
  * Series of numbers
- * Start is index of most recent value, usually 0
- * End is index of oldest value and higher than start
+ * End is index of most recent value, usually 0
+ * Start is index of oldest value and higher than end
  * */
 export class Chart {
-  public readonly end: number;
+  public readonly start: Index;
 
   constructor(
-    private readonly series: number[] = [],
-    readonly start: number = 0
+    public readonly series: Price[] = [],
+    readonly end: Index = 0
   ) {
-    this.end = this.start + this.series.length - 1;
+    this.start = this.end + this.series.length - 1;
+  }
+
+  /** Confirm if data is available at index */
+  public has(index: Index): boolean {
+    return index >= this.end && index <= this.start;
   }
 
   /** Look up value at index */
-  public val(index: number): number {
-    if (index < this.start || index > this.end)
-      throw new Error(
-        `Chart index ${index} is outside range ${this.start}-${this.end}.`
-      );
-    return this.series[index];
+  public val(index: Index): Price {
+    if (this.has(index)) return this.series[index];
+    throw new Error(
+      `Chart index ${index} is outside range ${this.start}->${this.end}.`
+    );
   }
 }

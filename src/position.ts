@@ -1,4 +1,4 @@
-import type { Instrument } from "./types.ts";
+import type { Amount, Index, Instrument, Price } from "./types.ts";
 
 export type Positions = Array<Position>;
 
@@ -11,21 +11,21 @@ export class Position {
   constructor(
     public readonly instrument: Instrument,
     public readonly units: number,
-    public readonly price: number
+    public readonly price: Price
   ) {}
 
   /** Original amount invested */
-  public get invested(): number {
+  public get invested(): Amount {
     return this.units * this.price;
   }
 
   /** Value of investment at time */
-  public value(time: Date = new Date()): number {
-    return this.units * this.instrument.price(time);
+  public value(index: Index = 0): Amount {
+    return this.units * this.instrument.price(index);
   }
 
   /** Profit of investment at time */
-  public profit(time: Date = new Date()): number {
-    return this.value(time) - this.invested;
+  public profit(index: Index = 0): Amount {
+    return this.value(index) - this.invested;
   }
 }

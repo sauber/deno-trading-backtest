@@ -43,12 +43,11 @@ Deno.test("Profit", () => {
 });
 
 Deno.test("Value", () => {
-  const time = new Date();
   const portfolio = new Portfolio();
   const amount = 100;
   portfolio.add(makePosition(amount));
   portfolio.add(makePosition(amount));
-  const value = portfolio.value(time);
+  const value = portfolio.value();
   assertNotEquals(value, amount);
 });
 
