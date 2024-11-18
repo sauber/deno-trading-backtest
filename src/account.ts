@@ -123,9 +123,9 @@ export class Account {
     return true;
   }
 
-  /** Copy of positions */
+  /** Oositions in portfolio */
   public get positions(): Array<Position> {
-    return [...this.portfolio.positions];
+    return this.portfolio.positions;
   }
 
   /** Combined value of positions and balance */
@@ -146,6 +146,7 @@ export class Account {
       "Amount",
       "Invested",
       "Cash",
+      "Value",
     ];
     table.rows = this.journal.list.map((t) => [
       t.index,
@@ -155,6 +156,7 @@ export class Account {
       money(t.amount),
       money(t.invested),
       money(t.cash),
+      money(t.invested + t.cash)
     ]);
     return table.toString();
   }

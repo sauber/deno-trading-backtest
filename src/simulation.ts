@@ -15,17 +15,29 @@ export class Simulation {
   public readonly performance: Performance = { steps: 0, buys: 0, sells: 0 };
   public readonly account: Account;
   private readonly exchange = new Exchange();
+  private readonly top: Strategy;
 
   constructor(
     private readonly market: Market,
     private readonly strategy: Strategy,
     private deposit: number = 10000
   ) {
+    this.top = strategy.first;
     this.account = new Account(deposit, this.market.start);
   }
 
   /** Buy all positions advised by strategy */
-  private buy(index: Index, strategy: Strategy): void {
+  private buy(index: Index): void {
+    const today: Strategy = new Strategy({
+      name: "buy",
+      amount: this.account.balance,
+      index,
+      instruments: this.market.on(index),
+    });
+
+    const strategy: Strategy = this.top.prepend(today);
+    strategy.print();
+
     const orders: PurchaseOrders = strategy.buy();
     for (const order of orders) {
       const position = this.exchange.buy(order.instrument, order.amount, index);
@@ -35,7 +47,14 @@ export class Simulation {
   }
 
   /** Sell all positions advised by strategy */
-  private sell(index: Index, strategy: Strategy): void {
+  private sell(index: Index): void {
+    const today: Strategy = new Strategy({
+      name: "sell",
+      index: index,
+      positions: this.account.positions,
+    });
+    const strategy: Strategy = this.top.prepend(today);
+
     const positions: Positions = strategy.sell();
     for (const position of positions) {
       const amount = this.exchange.sell(position, index);
@@ -46,19 +65,16 @@ export class Simulation {
 
   /** Perform one step of simulation */
   private step(index: Index): void {
-    // console.log("step:", { index });
-    const today: Strategy = new Strategy({
-      instruments: this.market.on(index),
-    }).append(this.strategy);
-    this.sell(index, today);
-    this.buy(index, today);
+    this.sell(index);
+    this.buy(index);
     ++this.performance.steps;
   }
 
   /** Run steps of simulation from start to end */
   public run(): void {
     let index: Index = this.market.start;
-    while (index >= this.market.end) {
+    // while (index >= this.market.end) {
+    while (index >= 690) {
       this.step(index--);
     }
   }

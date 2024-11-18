@@ -1,9 +1,9 @@
 /** Generate data for testing */
-import type { Instrument, Index, Price } from "./types.ts";
+import type { Instrument, Index, Price, Instruments } from "./types.ts";
 import { nanoid } from "nanoid";
 import { plot } from "asciichart";
 import { downsample, randn } from "@sauber/statistics";
-import { Position } from "./position.ts";
+import { Position, type Positions } from "./position.ts";
 import { Chart } from "./chart.ts";
 
 /** Generate a random chart */
@@ -80,7 +80,7 @@ export class TestInstrument implements Instrument {
   private readonly length: number = 700;
   private readonly chart: Chart = randomChart(this.length);
   public readonly end: Index = 0;
-  public readonly start: Index = this.length-1;
+  public readonly start: Index = this.length - 1;
 
   /** Random price with 10% of base price */
   public price(index: Index): Price {
@@ -115,4 +115,19 @@ export function makePosition(amount: number): Position {
   const price = instr.price(instr.start);
   const position = new Position(instr, amount / price, price);
   return position;
+}
+
+// Create array from callback
+function repeat<T>(callback: () => T, count: number): Array<T> {
+  return Array.from(Array(count).keys().map(callback));
+}
+
+/** A list of random instruments */
+export function makeInstruments(count: number): Instruments {
+  return repeat(makeInstrument, count);
+}
+
+/** A list of random instruments */
+export function makePositions(count: number, amount: number): Positions {
+  return repeat(() => makePosition(amount / count), count);
 }
