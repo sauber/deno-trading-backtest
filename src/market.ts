@@ -1,11 +1,11 @@
-import type { Index, Instruments } from "./types.ts";
+import type { Bar, Instruments } from "./types.ts";
 
 /** A collection of instruments */
 export class Market {
   /** The most recent chart index */
-  public readonly start: Index;
+  public readonly start: Bar;
   /** The oldest chart index */
-  public readonly end: Index;
+  public readonly end: Bar;
 
   constructor(private readonly instruments: Instruments) {
     this.end = Math.min(...instruments.map((i) => i.end));
@@ -13,7 +13,7 @@ export class Market {
   }
 
   /** Instruments available on date */
-  public on(index: Index = 0): Instruments {
+  public on(index: Bar = 0): Instruments {
     return this.instruments.filter((i) => i.active(index));
   }
 }

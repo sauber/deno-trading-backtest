@@ -1,7 +1,7 @@
 /** Generate data for testing */
 import type {
   Instrument,
-  Index,
+  Bar,
   Price,
   Instruments,
   Strategy,
@@ -87,17 +87,17 @@ export class TestInstrument implements Instrument {
   public readonly name: string = makeName(this.symbol);
   private readonly length: number = 700;
   private readonly chart: Chart = randomChart(this.length);
-  public readonly end: Index = 0;
-  public readonly start: Index = this.length - 1;
+  public readonly end: Bar = 0;
+  public readonly start: Bar = this.length - 1;
 
   /** Random price with 10% of base price */
-  public price(index: Index): Price {
-    return this.chart.val(index);
+  public price(bar: Bar): Price {
+    return this.chart.bar(bar);
   }
 
   /** Active if within  */
-  public active(index: Index): boolean {
-    return this.chart.has(index);
+  public active(bar: Bar): boolean {
+    return this.chart.has(bar);
   }
 
   /** Printable Ascii Chart */

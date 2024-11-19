@@ -1,5 +1,5 @@
 import { assertEquals, assertInstanceOf, assertThrows } from "@std/assert";
-import { Chart } from "./chart.ts";
+import { Chart, Returns, SharpeRatio } from "./chart.ts";
 
 Deno.test("Instance", () => {
   assertInstanceOf(new Chart(), Chart);
@@ -11,17 +11,42 @@ Deno.test("Start/end", () => {
   assertEquals(c.end, 0);
 });
 
+Deno.test("Bar", () => {
+  const c = new Chart([0, 1]);
+  assertEquals(c.bar(0), 1);
+  assertEquals(c.bar(1), 0);
+  assertThrows(() => c.bar(2));
+});
+
 Deno.test("Values", () => {
   const c = new Chart([0, 1]);
-  assertEquals(c.val(0), 0);
-  assertEquals(c.val(1), 1);
-  assertThrows(() => c.val(2));
+  assertEquals(c.values, [0, 1]);
 });
 
 Deno.test("Offset", () => {
-  const c = new Chart([0, 1], 5);
-  assertEquals(c.start, 6);
+  const c = new Chart([0, 1, 2], 5);
+  assertEquals(c.start, 7);
   assertEquals(c.end, 5);
-  assertEquals(c.val(6), 1);
-  assertEquals(c.val(5), 0);
+  assertEquals(c.bar(7), 0);
+  assertEquals(c.bar(6), 1);
+  assertEquals(c.bar(5), 2);
+});
+
+Deno.test("Returns", () => {
+  const c = new Chart([0, 1, 2], 3);
+  const r = Returns(c);
+  assertEquals(r.values, [1, 1]);
+  assertEquals(r.end, 3);
+});
+
+Deno.test("SharpeRatio", () => {
+  // Positive sharperatio
+  const p: Chart = new Chart([0, 1, 3]);
+  const psr: number = SharpeRatio(p);
+  assertEquals(psr, 3);
+
+  // Negative sharperatio
+  const n = new Chart([3, 1, 0], 3);
+  const nsr = SharpeRatio(n);
+  assertEquals(nsr, -0.75);
 });

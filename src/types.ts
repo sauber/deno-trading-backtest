@@ -1,7 +1,7 @@
 import type { Positions } from "./position.ts";
 
 /** Bar index in chart */
-export type Index = number;
+export type Bar = number;
 
 /** An amount of cash */
 export type Amount = number;
@@ -15,16 +15,16 @@ export type Instrument = {
   readonly symbol: string;
 
   // Last time when chart data is available, usually 0
-  readonly end: Index;
+  readonly end: Bar;
 
   // First time when chart data is available, number higher that start
-  readonly start: Index;
+  readonly start: Bar;
 
-  // Does instrument have price information at time
-  active: (index: Index) => boolean;
+  // Does instrument have price information at bar
+  active: (bar: Bar) => boolean;
 
   // Price of instrument at time
-  price: (index: Index) => Price;
+  price: (bar: Bar) => Price;
 };
 
 /** A list of instruments */
@@ -42,7 +42,7 @@ export type PurchaseOrders = Array<PurchaseOrder>;
 /** Data availble for strategies to make suggestions */
 export type StrategyContext = {
   /** Bar index in chart */
-  index: Index;
+  bar: Bar;
 
   /** Target amount for new positions */
   amount: Amount;

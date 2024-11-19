@@ -1,4 +1,4 @@
-import type { Amount, Index, Instrument, Price } from "./types.ts";
+import type { Amount, Bar, Instrument, Price } from "./types.ts";
 
 export type Positions = Array<Position>;
 
@@ -20,12 +20,12 @@ export class Position {
   }
 
   /** Value of investment at time */
-  public value(index: Index = 0): Amount {
+  public value(index: Bar = 0): Amount {
     return this.units * this.instrument.price(index);
   }
 
   /** Profit of investment at time */
-  public profit(index: Index = 0): Amount {
+  public profit(index: Bar = 0): Amount {
     return this.value(index) - this.invested;
   }
 }

@@ -1,10 +1,10 @@
 import { Table } from "@sauber/table";
 import { Portfolio } from "./portfolio.ts";
 import type { Position } from "./position.ts";
-import type { Amount, Index } from "./types.ts";
+import type { Amount, Bar } from "./types.ts";
 
 type Transaction = {
-  index: Index;
+  index: Bar;
   summary: string;
   amount: number;
   position?: Position;
@@ -24,7 +24,7 @@ class Journal {
 
   /** Add transaction */
   public push(transaction: Transaction): void {
-    const index: Index = transaction.index;
+    const index: Bar = transaction.index;
     const last: Transaction = this.last;
     /** Ensure transaction only roll forward in time, ie. index <= last.index */
     if (last?.index && index > last.index)
@@ -44,7 +44,7 @@ export class Account {
 
   /** Optionally deposit an amount at account opening */
   // TODO: Provide exhange with free policy
-  constructor(deposit: number = 0, index: Index = 0) {
+  constructor(deposit: number = 0, index: Bar = 0) {
     if (deposit != 0) this.deposit(deposit, index);
   }
 
@@ -54,7 +54,7 @@ export class Account {
   }
 
   /** Deposit an amount to account */
-  public deposit(amount: number, index: Index = 0) {
+  public deposit(amount: number, index: Bar = 0) {
     const prev = this.journal.last;
     const transaction: Transaction = {
       index,
@@ -67,7 +67,7 @@ export class Account {
   }
 
   /** Deposit an amount to account */
-  public withdraw(amount: number, index: Index = 0) {
+  public withdraw(amount: number, index: Bar = 0) {
     const prev = this.journal.last;
     const transaction: Transaction = {
       index,
@@ -81,7 +81,7 @@ export class Account {
 
   /** Add position to portfolio, deduct payment from cash */
   // TODO: Convert amount to position on exchange
-  public add(position: Position, amount: number, index: Index = 0): boolean {
+  public add(position: Position, amount: number, index: Bar = 0): boolean {
     // Cannot open unfunded position
     const prev = this.journal.last;
     if (amount > prev.cash) return false;
@@ -103,7 +103,7 @@ export class Account {
 
   /** Remove position from portfolio, add return to cash */
   // Get amount from exchange transaction
-  public remove(position: Position, amount: number, index: Index = 0): boolean {
+  public remove(position: Position, amount: number, index: Bar = 0): boolean {
     // Only close if actually in portfolio
     if (!this.portfolio.has(position)) return false;
 
@@ -129,7 +129,7 @@ export class Account {
   }
 
   /** Combined value of positions and balance */
-  public value(index: Index): Amount {
+  public value(index: Bar): Amount {
     return this.balance + this.portfolio.value(index);
   }
 

@@ -1,6 +1,6 @@
 import { Table } from "@sauber/table";
 import type { Position } from "./position.ts";
-import { Amount, Index } from "./types.ts";
+import { Amount, Bar } from "./types.ts";
 
 /** A collection of instruments */
 export class Portfolio {
@@ -38,7 +38,7 @@ export class Portfolio {
   }
 
   /** Total unrealized profit of all positions */
-  public profit(index: Index = 0): number {
+  public profit(index: Bar = 0): number {
     return this.positions.reduce(
       (sum: number, p: Position) => sum + p.profit(index),
       0
@@ -46,7 +46,7 @@ export class Portfolio {
   }
 
   /** Total unrealized value of all positions */
-  public value(index: Index = 0): number {
+  public value(index: Bar = 0): number {
     return this.positions.reduce(
       (sum: number, p: Position) => sum + p.value(index),
       0
