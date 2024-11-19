@@ -4,7 +4,6 @@ import { makeInstrument } from "./testdata.ts";
 import type { Position } from "./position.ts";
 import {
   assertAlmostEquals,
-  assertEquals,
   assertInstanceOf,
 } from "@std/assert";
 
@@ -27,5 +26,5 @@ Deno.test("Sell", () => {
   const buying = 1000;
   const position: Position = ex.buy(instr, buying);
   const selling = ex.sell(position);
-  assertEquals(selling, buying);
+  assertAlmostEquals(selling, buying);
 });

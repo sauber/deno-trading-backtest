@@ -1,5 +1,13 @@
 /** Generate data for testing */
-import type { Instrument, Index, Price, Instruments } from "./types.ts";
+import type {
+  Instrument,
+  Index,
+  Price,
+  Instruments,
+  Strategy,
+  PurchaseOrders,
+  StrategyContext,
+} from "./types.ts";
 import { nanoid } from "nanoid";
 import { plot } from "asciichart";
 import { downsample, randn } from "@sauber/statistics";
@@ -130,4 +138,34 @@ export function makeInstruments(count: number): Instruments {
 /** A list of random instruments */
 export function makePositions(count: number, amount: number): Positions {
   return repeat(() => makePosition(amount / count), count);
+}
+
+/** Pick a random item from an array */
+function any<T>(items: Array<T>): Array<T> {
+  const count = items.length;
+  if (count < 1) return [];
+  const index = Math.floor(Math.random() * count);
+  return [items[index]];
+}
+
+/** Maybe true, may false */
+function maybe(): boolean {
+  return Math.random() < 0.5;
+}
+
+/** Maybe buy a positions, maybe close a position */
+export class TestStrategy implements Strategy {
+  public open(context: StrategyContext): PurchaseOrders {
+    if (maybe()) return [];
+
+    return any(context.instruments).map((instrument) => ({
+      instrument,
+      amount: context.amount/10,
+    }));
+  }
+
+  public close(context: StrategyContext): Positions {
+    if (maybe()) return [];
+    return any(context.positions);
+  }
 }

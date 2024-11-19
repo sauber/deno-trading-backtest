@@ -1,3 +1,5 @@
+import type { Positions } from "./position.ts";
+
 /** Bar index in chart */
 export type Index = number;
 
@@ -36,3 +38,27 @@ export type PurchaseOrder = {
 
 /** A list of Purchase orders */
 export type PurchaseOrders = Array<PurchaseOrder>;
+
+/** Data availble for strategies to make suggestions */
+export type StrategyContext = {
+  /** Bar index in chart */
+  index: Index;
+
+  /** Target amount for new positions */
+  amount: Amount;
+
+  /** Instruments available at index */
+  instruments: Instruments;
+
+  /** Current open positions */
+  positions: Positions;
+};
+
+/** Strategy to suggest positions to open and close */
+export type Strategy = {
+  // Generate list of positions to open
+  open: (context: StrategyContext) => PurchaseOrders;
+
+  // Generate list of positions to close
+  close: (context: StrategyContext) => Positions;
+}
