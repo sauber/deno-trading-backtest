@@ -1,47 +1,34 @@
-import { assertEquals, assertInstanceOf } from "@std/assert";
+import { assertEquals, assertGreater, assertInstanceOf } from "@std/assert";
 import { Simulation } from "./simulation.ts";
 import { Market } from "./market.ts";
-import { TestInstrument } from "./testdata.ts";
-import { NullStrategy } from "./strategy.ts";
-import type { Instruments } from "./types.ts";
-
-// Create array from callback
-function repeat<T>(callback: () => T, count: number): Array<T> {
-  return Array.from(Array(count).keys().map(callback));
-}
-
-/** A list of random instruments */
-export function instruments(count: number): Instruments {
-  return repeat(() => new TestInstrument(), count);
-}
+import { makeInstruments, TestStrategy } from "./testdata.ts";
 
 // Initialize a market with a count of random instruments
 function makeMarket(count: number): Market {
-  return new Market(instruments(count));
+  return new Market(makeInstruments(count));
 }
 
 Deno.test("Instance", () => {
   assertInstanceOf(
-    new Simulation(makeMarket(0), new NullStrategy()),
+    new Simulation(makeMarket(0), new TestStrategy()),
     Simulation
   );
 });
 
 Deno.test("Steps", () => {
   const market = makeMarket(1);
-  const s = new Simulation(market, new NullStrategy());
+  const s = new Simulation(market, new TestStrategy());
   assertEquals(s.performance.steps, 0);
   s.run();
-  const days: number = Math.floor(
-    (market.end.getTime() - market.start.getTime()) / (1000 * 3600 * 24)
-  );
+  const days: number = market.start - market.end;
   assertEquals(s.performance.steps, days + 1);
 });
 
-Deno.test("Buying", () => {
-  const market = makeMarket(1);
-  const s = new Simulation(market, new NullStrategy());
+Deno.test("Buying and selling", () => {
+  const market = makeMarket(10);
+  const s = new Simulation(market, new TestStrategy());
   assertEquals(s.performance.steps, 0);
   s.run();
-  assertEquals(s.performance.buys, 0);
+  assertGreater(s.performance.buys, 0);
+  assertGreater(s.performance.sells, 0);
 });

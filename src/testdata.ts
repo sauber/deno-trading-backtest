@@ -1,12 +1,21 @@
 /** Generate data for testing */
-import type { Instrument } from "./types.ts";
+import type {
+  Instrument,
+  Index,
+  Price,
+  Instruments,
+  Strategy,
+  PurchaseOrders,
+  StrategyContext,
+} from "./types.ts";
 import { nanoid } from "nanoid";
 import { plot } from "asciichart";
 import { downsample, randn } from "@sauber/statistics";
-import { Position } from "./position.ts";
+import { Position, type Positions } from "./position.ts";
+import { Chart } from "./chart.ts";
 
 /** Generate a random chart */
-function randomChart(count: number): number[] {
+function randomChart(count: number): Chart {
   const chart: number[] = [];
   let price = 1000 * Math.random();
   for (let i = 0; i < count; i++) {
@@ -14,7 +23,7 @@ function randomChart(count: number): number[] {
     price *= 1 + change;
     chart.push(parseFloat(price.toFixed(4)));
   }
-  return chart;
+  return new Chart(chart);
 }
 
 /** Make up a business name from an acronym */
@@ -28,7 +37,7 @@ Marketing Educational Foundation United States Environmental Protection
 Agency Federal Emergency Management Home School Legal Defense Housing 
 and Urban Development International Atomic Energy Crime Police 
 Organization Olympic Committee Internal Revenue Service Standardization
-National  of Broadcast Employees Technicians National Aeronautics Space 
+National of Broadcast Employees Technicians National Aeronautics Space 
 Administration North Atlantic Treaty National Rifle of the Petroleum 
 Exporting Countries Occupational Safety Health Transport Elderly 
 Disabled Persons United Nations Childrens Fund World Health World 
@@ -36,7 +45,7 @@ Wildlife Young Mens Christian The Minnesota Mining Manufacturing
 Company Allen Wright Telephone Telegraph Bavarian Motor Works Bradley 
 Voorhees Day Consumer Value Stores Government Insurance Sports 
 Programming Network Experimental Prototype Community of Tomorrow Henry 
-Richard Block Hennes Mauritz Hongkong Shanghai Banking Corporation
+Richard Block Mauritz Hongkong Shanghai Banking Corporation
 Machines James Bullough Lansing Leon Leonwood Bean Mars Murries Makeup 
 Art Cosmetics National Broadcasting Cooking Spray Product of Arthur 
 Meyer Non-Expandable Recreational Foam Recreational Equipment Shoulder 
@@ -77,30 +86,25 @@ export class TestInstrument implements Instrument {
   public readonly symbol: string = nanoid(4).toUpperCase();
   public readonly name: string = makeName(this.symbol);
   private readonly length: number = 700;
-  private readonly chart: number[] = randomChart(this.length);
-  public readonly end: Date = new Date();
-  public readonly start: Date = new Date(
-    new Date().setDate(this.end.getDate() - this.length + 1)
-  );
+  private readonly chart: Chart = randomChart(this.length);
+  public readonly end: Index = 0;
+  public readonly start: Index = this.length - 1;
 
   /** Random price with 10% of base price */
-  public price(time: Date): number {
-    const diff = time.getTime() - this.start.getTime();
-    const diffDays = Math.ceil(diff / (1000 * 3600 * 24));
-    // console.log("chart price on", time, {diffDays, chartlength: this.chart.length});
-    const price = this.chart[diffDays];
-    return price;
+  public price(index: Index): Price {
+    return this.chart.val(index);
   }
 
   /** Active if within  */
-  public active(time: Date): boolean {
-    return time >= this.start && time <= this.end;
+  public active(index: Index): boolean {
+    return this.chart.has(index);
   }
 
   /** Printable Ascii Chart */
   public plot(height: number = 15, width: number = 78): string {
     height -= 2;
-    const chart = downsample(this.chart, width - 7);
+    const price = this.chart.series.slice().reverse();
+    const chart = downsample(price, width - 7);
     const padding = "       ";
     return (
       `[ ${this.symbol} - ${this.name}]\n` + plot(chart, { height, padding })

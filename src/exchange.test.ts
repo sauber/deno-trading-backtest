@@ -10,22 +10,18 @@ Deno.test("Instance", () => {
 });
 
 Deno.test("Buy", () => {
-  const time = new Date();
   const ex = new Exchange();
   const instr: Instrument = makeInstrument();
   const amount = 1000;
-  const position: Position = ex.buy(instr, amount, time);
-  // console.log(position);
+  const position: Position = ex.buy(instr, amount);
   assertAlmostEquals(position.price * position.units, amount);
 });
 
 Deno.test("Sell", () => {
-  const time = new Date();
   const ex = new Exchange();
   const instr: Instrument = makeInstrument();
   const buying = 1000;
-  const position: Position = ex.buy(instr, buying, time);
-  const selling = ex.sell(position, time);
-  assertLess(selling / buying, 1.1 / 0.9);
-  assertGreater(selling / buying, 0.9 / 1.1);
+  const position: Position = ex.buy(instr, buying);
+  const selling = ex.sell(position);
+  assertAlmostEquals(selling, buying);
 });

@@ -1,25 +1,19 @@
-import type { Instruments } from "./types.ts";
-
-// Compare two dates
-function sorttx(a: Date, b: Date): number {
-  return b.getTime() - a.getTime();
-}
+import type { Index, Instruments } from "./types.ts";
 
 /** A collection of instruments */
 export class Market {
-  public readonly start: Date;
-  public readonly end: Date;
+  /** The most recent chart index */
+  public readonly start: Index;
+  /** The oldest chart index */
+  public readonly end: Index;
 
   constructor(private readonly instruments: Instruments) {
-    this.start = instruments.map((i) => i.start).sort(sorttx)[0];
-    this.end = instruments
-      .map((i) => i.end)
-      .sort(sorttx)
-      .reverse()[0];
+    this.end = Math.min(...instruments.map((i) => i.end));
+    this.start = Math.max(...instruments.map((i) => i.start));
   }
 
   /** Instruments available on date */
-  public on(time: Date): Instruments {
-    return this.instruments.filter((i) => i.active(time));
+  public on(index: Index = 0): Instruments {
+    return this.instruments.filter((i) => i.active(index));
   }
 }
