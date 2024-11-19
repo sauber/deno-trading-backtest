@@ -18,7 +18,7 @@ export class Chart {
     /** Series of chart values array */
     public readonly series: Series = [],
     /** Bar index of most recent value */
-    public readonly end: Bar = 0
+    public end: Bar = 0
   ) {
     this.start = this.end + this.series.length - 1;
   }
@@ -37,6 +37,12 @@ export class Chart {
 
     const index = this.series.length - bar + this.end - 1;
     return this.series[index];
+  }
+
+  /** Extend series with value */
+  public add(price: Price): void {
+    this.series.push(price);
+    --this.end;
   }
 
   /** Array of all values */

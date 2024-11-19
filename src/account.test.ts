@@ -61,3 +61,10 @@ Deno.test("Close", () => {
   account.remove(pos, amount);
   assertEquals(account.balance, start);
 });
+
+Deno.test("Automatic valuation", () => {
+  const amount = 100;
+  const account = new Account(amount, 2);
+  account.withdraw(amount, 0);
+  assertEquals(account.valuation.series, [amount, amount, amount]);
+});

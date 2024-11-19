@@ -1,16 +1,17 @@
 import { Table } from "@sauber/table";
 import { Portfolio } from "./portfolio.ts";
 import type { Position } from "./position.ts";
-import type { Amount, Bar } from "./types.ts";
+import type { Amount, Bar, Price } from "./types.ts";
+import { Chart } from "./chart.ts";
 
 type Transaction = {
-  index: Bar;
+  bar: Bar;
   summary: string;
-  amount: number;
+  amount: Amount;
   position?: Position;
-  price?: number;
-  invested: number;
-  cash: number;
+  price?: Price;
+  invested: Amount;
+  cash: Amount;
 };
 
 /** A list of transaction */
@@ -24,12 +25,12 @@ class Journal {
 
   /** Add transaction */
   public push(transaction: Transaction): void {
-    const index: Bar = transaction.index;
+    const bar: Bar = transaction.bar;
     const last: Transaction = this.last;
-    /** Ensure transaction only roll forward in time, ie. index <= last.index */
-    if (last?.index && index > last.index)
+    /** Ensure transaction only roll forward in time, ie. bar <= bar.index */
+    if (last?.bar && bar > last.bar)
       throw new Error(
-        `Transaction with index ${index} added before last index ${last.index}.`
+        `Transaction at bar ${bar} added before newest bar ${last.bar}.`
       );
     this.list.push(transaction);
   }
@@ -42,10 +43,14 @@ export class Account {
   /** Collection of positions */
   public readonly portfolio: Portfolio = new Portfolio();
 
+  /** Valuation */
+  public readonly valuation: Chart;
+
   /** Optionally deposit an amount at account opening */
-  // TODO: Provide exhange with free policy
-  constructor(deposit: number = 0, index: Bar = 0) {
-    if (deposit != 0) this.deposit(deposit, index);
+  // TODO: Provide exhange with fee policy
+  constructor(deposit: number = 0, bar: Bar = 0) {
+    this.valuation = new Chart([deposit], bar);
+    if (deposit != 0) this.deposit(deposit, bar);
   }
 
   /** Amount of available funds */
@@ -53,11 +58,27 @@ export class Account {
     return this.journal.last.cash;
   }
 
+  /** Valuation at each bar */
+  private valuate(bar: Bar): void {
+    const end = this.valuation.end;
+    if (bar > end)
+      throw new Error(
+        `Valuation at new bar ${bar} is prior to latest bar ${end}`
+      );
+    if (bar == end) return;
+
+    // Catch up until bar
+    const cash = this.balance;
+    for (let index = end - 1; index >= bar; index--)
+      this.valuation.add(cash + this.portfolio.value(index));
+  }
+
   /** Deposit an amount to account */
-  public deposit(amount: number, index: Bar = 0) {
+  public deposit(amount: number, bar: Bar = 0) {
+    this.valuate(bar);
     const prev = this.journal.last;
     const transaction: Transaction = {
-      index,
+      bar,
       summary: "Deposit",
       amount,
       invested: prev?.invested || 0,
@@ -67,10 +88,11 @@ export class Account {
   }
 
   /** Deposit an amount to account */
-  public withdraw(amount: number, index: Bar = 0) {
+  public withdraw(amount: number, bar: Bar = 0) {
+    this.valuate(bar);
     const prev = this.journal.last;
     const transaction: Transaction = {
-      index,
+      bar,
       summary: "Withdraw",
       amount,
       invested: prev?.invested || 0,
@@ -81,14 +103,15 @@ export class Account {
 
   /** Add position to portfolio, deduct payment from cash */
   // TODO: Convert amount to position on exchange
-  public add(position: Position, amount: number, index: Bar = 0): boolean {
+  public add(position: Position, amount: number, bar: Bar = 0): boolean {
+    this.valuate(bar);
     // Cannot open unfunded position
     const prev = this.journal.last;
     if (amount > prev.cash) return false;
 
     this.portfolio.add(position);
     const transaction: Transaction = {
-      index,
+      bar,
       summary: "Open",
       amount,
       position,
@@ -103,14 +126,15 @@ export class Account {
 
   /** Remove position from portfolio, add return to cash */
   // Get amount from exchange transaction
-  public remove(position: Position, amount: number, index: Bar = 0): boolean {
+  public remove(position: Position, amount: number, bar: Bar = 0): boolean {
+    this.valuate(bar);
     // Only close if actually in portfolio
     if (!this.portfolio.has(position)) return false;
 
     this.portfolio.remove(position);
     const prev = this.journal.last;
     const transaction: Transaction = {
-      index,
+      bar,
       summary: "Close",
       amount,
       position,
@@ -129,8 +153,8 @@ export class Account {
   }
 
   /** Combined value of positions and balance */
-  public value(index: Bar): Amount {
-    return this.balance + this.portfolio.value(index);
+  public value(bar: Bar): Amount {
+    return this.balance + this.portfolio.value(bar);
   }
 
   /** A printable statement */
@@ -139,7 +163,7 @@ export class Account {
     const table = new Table();
     table.title = "Transactions";
     table.headers = [
-      "Index",
+      "Bar",
       "Action",
       "Symbol",
       "Price",
@@ -149,14 +173,14 @@ export class Account {
       "Value",
     ];
     table.rows = this.journal.list.map((t) => [
-      t.index,
+      t.bar,
       t.summary,
       t.position ? t.position.instrument.symbol : "",
       t.price ? money(t.price) : "",
       money(t.amount),
       money(t.invested),
       money(t.cash),
-      money(t.invested + t.cash)
+      money(t.invested + t.cash),
     ]);
     return table.toString();
   }
