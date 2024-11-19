@@ -2,12 +2,7 @@ import { Exchange } from "./exchange.ts";
 import type { Instrument } from "./types.ts";
 import { makeInstrument } from "./testdata.ts";
 import type { Position } from "./position.ts";
-import {
-  assertAlmostEquals,
-  assertGreater,
-  assertInstanceOf,
-  assertLess,
-} from "@std/assert";
+import { assertAlmostEquals, assertInstanceOf } from "@std/assert";
 
 Deno.test("Instance", () => {
   const ex = new Exchange();

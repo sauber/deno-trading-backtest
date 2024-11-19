@@ -120,3 +120,48 @@ export function makePosition(amount: number): Position {
   const position = new Position(instr, amount / price, price);
   return position;
 }
+
+// Create array from callback
+function repeat<T>(callback: () => T, count: number): Array<T> {
+  return Array.from(Array(count).keys().map(callback));
+}
+
+/** A list of random instruments */
+export function makeInstruments(count: number): Instruments {
+  return repeat(makeInstrument, count);
+}
+
+/** A list of random instruments */
+export function makePositions(count: number, amount: number): Positions {
+  return repeat(() => makePosition(amount / count), count);
+}
+
+/** Pick a random item from an array */
+function any<T>(items: Array<T>): Array<T> {
+  const count = items.length;
+  if (count < 1) return [];
+  const index = Math.floor(Math.random() * count);
+  return [items[index]];
+}
+
+/** Maybe true, may false */
+function maybe(): boolean {
+  return Math.random() < 0.5;
+}
+
+/** Maybe buy a positions, maybe close a position */
+export class TestStrategy implements Strategy {
+  public open(context: StrategyContext): PurchaseOrders {
+    if (maybe()) return [];
+
+    return any(context.instruments).map((instrument) => ({
+      instrument,
+      amount: context.amount / 10,
+    }));
+  }
+
+  public close(context: StrategyContext): Positions {
+    if (maybe()) return [];
+    return any(context.positions);
+  }
+}
