@@ -47,6 +47,8 @@ export class Portfolio {
 
   /** Total unrealized value of all positions */
   public value(index: Bar = 0): number {
+    // for ( const pos of this.positions) console.log(index, 'portfolio value', pos.print());
+    
     return this.positions.reduce(
       (sum: number, p: Position) => sum + p.value(index),
       0,
@@ -54,7 +56,7 @@ export class Portfolio {
   }
 
   /** Printable statement */
-  public get statement(): string {
+  public statement(bar: Bar): string {
     const money = (v: number): number => parseFloat(v.toFixed(2));
     // const now: Date = new Date();
     const t = new Table();
@@ -70,7 +72,7 @@ export class Portfolio {
     let profit = 0;
     let value = 0;
     t.rows = this.positions.map((p) => {
-      const positionValue = p.value();
+      const positionValue = p.value(bar);
 
       // Portfolio stats
       value += positionValue;

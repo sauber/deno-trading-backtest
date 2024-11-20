@@ -83,6 +83,7 @@ export class Account {
     // Catch up until bar
     const cash = this.balance;
     for (let index = end - 1; index >= bar; index--) {
+      // console.log(index, 'account valuation');
       this.valuation.add(cash + this.portfolio.value(index));
     }
   }
@@ -141,6 +142,7 @@ export class Account {
   /** Remove position from portfolio, add return to cash */
   // Get amount from exchange transaction
   public remove(position: Position, amount: number, bar: Bar = 0): boolean {
+    // console.log(bar, 'account remove', position.print());
     this.valuate(bar);
     // Only close if actually in portfolio
     if (!this.portfolio.has(position)) return false;

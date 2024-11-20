@@ -16,7 +16,7 @@ import { Chart } from "./chart.ts";
 import { Exchange } from "./exchange.ts";
 
 /** Generate a random chart */
-function randomChart(count: number): Chart {
+function randomChart(count: number, end: Bar): Chart {
   const chart: number[] = [];
   let price = 1000 * Math.random();
   for (let i = 0; i < count; i++) {
@@ -24,7 +24,7 @@ function randomChart(count: number): Chart {
     price *= 1 + change;
     chart.push(parseFloat(price.toFixed(4)));
   }
-  return new Chart(chart);
+  return new Chart(chart, end);
 }
 
 /** Make up a business name from an acronym */
@@ -86,10 +86,16 @@ Jet Jura Juicy
 export class TestInstrument implements Instrument {
   public readonly symbol: string = nanoid(4).toUpperCase();
   public readonly name: string = makeName(this.symbol);
-  private readonly length: number = 700;
-  private readonly chart: Chart = randomChart(this.length);
-  public readonly end: Bar = 0;
-  public readonly start: Bar = this.length - 1;
+  private readonly chart: Chart;
+  public readonly start: Bar;
+
+  constructor(
+    private readonly length: number = 700,
+    public readonly end: Bar = 0,
+  ) {
+    this.chart = randomChart(this.length, end);
+    this.start = this.chart.start;
+  }
 
   /** Random price with 10% of base price */
   public price(bar: Bar): Price {
@@ -126,14 +132,12 @@ function any<T>(items: Array<T>): Array<T> {
   return [items[index]];
 }
 
-/** Maybe true, may false */
-function maybe(): boolean {
-  return Math.random() < 0.5;
-}
 
-// Generate an instrument
+/** Generate an instrument */
 export function makeInstrument(): Instrument {
-  return new TestInstrument();
+  const length: number = Math.floor(Math.random() * 700);
+  const end: Bar = Math.floor(Math.random() * 150);
+  return new TestInstrument(length, end);
 }
 
 /** A list of random instruments */
@@ -163,7 +167,7 @@ export function makePositions(count: number, amount: number): Positions {
 /** Maybe buy a positions, maybe close a position */
 export class TestStrategy implements Strategy {
   public open(context: StrategyContext): PurchaseOrders {
-    if (maybe()) return [];
+    if (Math.random()>0.05) return [];
 
     return any(context.instruments).map((instrument) => ({
       instrument,
@@ -172,7 +176,7 @@ export class TestStrategy implements Strategy {
   }
 
   public close(context: StrategyContext): Positions {
-    if (maybe()) return [];
+    if (Math.random()>0.05) return [];
     return any(context.positions);
   }
 }

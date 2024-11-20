@@ -4,6 +4,7 @@ import type { Positions } from "./position.ts";
 import { Stats } from "./stats.ts";
 import type {
   Bar,
+  Instruments,
   PurchaseOrders,
   Strategy,
   StrategyContext,
@@ -18,6 +19,24 @@ export class Simulation {
     private deposit: number = 10000,
   ) {
     this.account = exchange.createAccount(deposit, exchange.start);
+  }
+
+  /** Expire all positions no longer having data at bar */
+  private expire(bar: Bar): void {
+    const available: Instruments = this.exchange.on(bar);
+    const positions: Positions = [...this.account.positions]; // Clone before splicing
+    // console.log(bar, "simulation expire", {available: available.length, positions: positions.length});
+
+    for (const position of positions) {
+      if (!available.includes(position.instrument)) {
+        // console.log(bar, "simulation expire remove", position.print());
+        const amount = this.exchange.sell(position, bar + 1);
+        this.account.remove(position, amount, bar + 1);
+      } else {
+        // console.log(bar, "simulation expire keep", position.print());
+      }
+    }
+    // console.log(bar, "simulation expire positions after removal:", this.account.positions.length);
   }
 
   /** Buy all positions advised by strategy */
@@ -37,6 +56,7 @@ export class Simulation {
 
     for (const order of orders) {
       const position = this.exchange.buy(order.instrument, order.amount, bar);
+      // console.log(bar, "simulation buy", position.print());
       this.account.add(position, order.amount, bar);
     }
   }
@@ -53,6 +73,7 @@ export class Simulation {
     const positions: Positions = this.strategy.close(today);
 
     for (const position of positions) {
+      // console.log(bar, "simulation sell", position.print());
       const amount = this.exchange.sell(position, bar);
       this.account.remove(position, amount, bar);
     }
@@ -60,7 +81,7 @@ export class Simulation {
 
   /** Perform one step of simulation */
   private step(bar: Bar): void {
-    // TODO: expire previous bar
+    this.expire(bar);
     this.sell(bar);
     this.buy(bar);
   }
