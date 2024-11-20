@@ -1,6 +1,6 @@
 import { Table } from "@sauber/table";
 import type { Position } from "./position.ts";
-import { Amount, Bar } from "./types.ts";
+import type { Amount, Bar } from "./types.ts";
 
 /** A collection of instruments */
 export class Portfolio {
@@ -33,23 +33,23 @@ export class Portfolio {
   public get invested(): Amount {
     return this.positions.reduce(
       (sum: number, p: Position) => sum + p.invested,
-      0
+      0,
     );
   }
 
   /** Total unrealized profit of all positions */
-  public profit(index: Bar = 0): number {
-    return this.positions.reduce(
-      (sum: number, p: Position) => sum + p.profit(index),
-      0
-    );
-  }
+  // public profit(index: Bar = 0): number {
+  //   return this.positions.reduce(
+  //     (sum: number, p: Position) => sum + p.profit(index),
+  //     0
+  //   );
+  // }
 
   /** Total unrealized value of all positions */
   public value(index: Bar = 0): number {
     return this.positions.reduce(
       (sum: number, p: Position) => sum + p.value(index),
-      0
+      0,
     );
   }
 
@@ -86,9 +86,11 @@ export class Portfolio {
         money(positionValue),
       ];
     });
-    t.title = `Portfolio position=${this.positions.length}, invested=${money(
-      invested
-    )}, profit=${money(profit)}, value=${money(value)}`;
+    t.title = `Portfolio position=${this.positions.length}, invested=${
+      money(
+        invested,
+      )
+    }, profit=${money(profit)}, value=${money(value)}`;
     return t.toString();
   }
 }

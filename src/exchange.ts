@@ -1,24 +1,38 @@
-import type { Amount, Bar, Instrument, Price } from "./types.ts";
-import { TestInstrument } from "./testdata.ts";
+import type { Amount, Bar, Instrument, Instruments, Price } from "./types.ts";
 import { Position } from "./position.ts";
+import { Account } from "./account.ts";
 
-/** An exchange of random instruments */
+/** An exchange where accounts can aquire or release positions in instruments for a fee */
 export class Exchange {
-  constructor(
-    private readonly spread: number = 0,
-    private readonly fee: number = 0
-  ) {}
+  /** The oldest chart bar index */
+  public readonly start: Bar;
+  /** The most recent chart bar index */
+  public readonly end: Bar;
 
-  /** A random instrument */
-  public any(): TestInstrument {
-    return new TestInstrument();
+  constructor(
+    private readonly instruments: Instruments,
+    private readonly spread: number = 0,
+    private readonly fee: number = 0,
+  ) {
+    this.start = Math.max(...instruments.map((i) => i.start));
+    this.end = Math.min(...instruments.map((i) => i.end));
+  }
+
+  /** Create account on exchange, optional deposit and start bar */
+  public createAccount(deposit: Amount = 0, start: Bar = 0): Account {
+    return new Account(this, deposit, start);
+  }
+
+  /** Instruments available at bar */
+  public on(bar: Bar): Instruments {
+    return this.instruments.filter((i) => i.active(bar));
   }
 
   /** Create a position amount of instrument. Amount is subtracted fee and spread. */
   public buy(
     instrument: Instrument,
     amount: number,
-    index: Bar = 0
+    index: Bar = 0,
   ): Position {
     const marketPrice: Price = instrument.price(index);
     const exchangePrice: Price = marketPrice * (1 + this.spread);
@@ -26,7 +40,7 @@ export class Exchange {
     const purchaseAmount: Amount = amount - fee;
     const units = purchaseAmount / exchangePrice;
     // console.log({marketPrice, exchangePrice, fee, purchaseAmount, units});
-    return new Position(instrument, units, exchangePrice);
+    return new Position(instrument, amount, exchangePrice, units, index);
   }
 
   /** Sell position for a fee at spread lower than price */

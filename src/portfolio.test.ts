@@ -2,7 +2,6 @@ import {
   assertEquals,
   assertGreater,
   assertInstanceOf,
-  assertLess,
   assertNotEquals,
 } from "@std/assert";
 import { Portfolio } from "./portfolio.ts";
@@ -34,13 +33,13 @@ Deno.test("Amount invested", () => {
   assertEquals(portfolio.invested, 2 * amount);
 });
 
-Deno.test("Profit", () => {
-  const portfolio = new Portfolio();
-  const amount = 100;
-  portfolio.add(makePosition(amount));
-  portfolio.add(makePosition(amount));
-  assertNotEquals(portfolio.profit(), 0);
-});
+// Deno.test("Profit", () => {
+//   const portfolio = new Portfolio();
+//   const amount = 100;
+//   portfolio.add(makePosition(amount));
+//   portfolio.add(makePosition(amount));
+//   assertNotEquals(portfolio.profit(), 0);
+// });
 
 Deno.test("Value", () => {
   const portfolio = new Portfolio();

@@ -1,11 +1,11 @@
 /** Generate data for testing */
 import type {
-  Instrument,
   Bar,
-  Price,
+  Instrument,
   Instruments,
-  Strategy,
+  Price,
   PurchaseOrders,
+  Strategy,
   StrategyContext,
 } from "./types.ts";
 import { nanoid } from "nanoid";
@@ -13,6 +13,7 @@ import { plot } from "asciichart";
 import { downsample, randn } from "@sauber/statistics";
 import { Position, type Positions } from "./position.ts";
 import { Chart } from "./chart.ts";
+import { Exchange } from "./exchange.ts";
 
 /** Generate a random chart */
 function randomChart(count: number): Chart {
@@ -112,32 +113,9 @@ export class TestInstrument implements Instrument {
   }
 }
 
-// Generate an instrument
-export function makeInstrument(): Instrument {
-  return new TestInstrument();
-}
-
-// Generate a position
-export function makePosition(amount: number): Position {
-  const instr: Instrument = makeInstrument();
-  const price = instr.price(instr.start);
-  const position = new Position(instr, amount / price, price);
-  return position;
-}
-
 // Create array from callback
 function repeat<T>(callback: () => T, count: number): Array<T> {
   return Array.from(Array(count).keys().map(callback));
-}
-
-/** A list of random instruments */
-export function makeInstruments(count: number): Instruments {
-  return repeat(makeInstrument, count);
-}
-
-/** A list of random instruments */
-export function makePositions(count: number, amount: number): Positions {
-  return repeat(() => makePosition(amount / count), count);
 }
 
 /** Pick a random item from an array */
@@ -151,6 +129,35 @@ function any<T>(items: Array<T>): Array<T> {
 /** Maybe true, may false */
 function maybe(): boolean {
   return Math.random() < 0.5;
+}
+
+// Generate an instrument
+export function makeInstrument(): Instrument {
+  return new TestInstrument();
+}
+
+/** A list of random instruments */
+export function makeInstruments(count: number): Instruments {
+  return repeat(makeInstrument, count);
+}
+
+// Generate a position
+export function makePosition(amount: number): Position {
+  const instr: Instrument = makeInstrument();
+  const price = instr.price(instr.start);
+  const position = new Position(
+    instr,
+    amount,
+    price,
+    amount / price,
+    instr.start,
+  );
+  return position;
+}
+
+/** A list of random instruments */
+export function makePositions(count: number, amount: number): Positions {
+  return repeat(() => makePosition(amount / count), count);
 }
 
 /** Maybe buy a positions, maybe close a position */
@@ -168,4 +175,9 @@ export class TestStrategy implements Strategy {
     if (maybe()) return [];
     return any(context.positions);
   }
+}
+
+/** Create an exchange with a number if instruments availabel */
+export function makeExchange(count: number): Exchange {
+  return new Exchange(makeInstruments(count));
 }

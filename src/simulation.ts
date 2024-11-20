@@ -1,6 +1,5 @@
-import { Account } from "./account.ts";
-import { Exchange } from "./exchange.ts";
-import type { Market } from "./market.ts";
+import type { Account } from "./account.ts";
+import type { Exchange } from "./exchange.ts";
 import type { Positions } from "./position.ts";
 import type {
   Bar,
@@ -9,23 +8,21 @@ import type {
   StrategyContext,
 } from "./types.ts";
 
-type Performance = {
-  steps: number;
-  buys: number;
-  sells: number;
-};
+// type Performance = {
+//   steps: number;
+//   buys: number;
+//   sells: number;
+// };
 
 export class Simulation {
-  public readonly performance: Performance = { steps: 0, buys: 0, sells: 0 };
   public readonly account: Account;
-  private readonly exchange = new Exchange();
 
   constructor(
-    private readonly market: Market,
+    private readonly exchange: Exchange,
     private readonly strategy: Strategy,
-    private deposit: number = 10000
+    private deposit: number = 10000,
   ) {
-    this.account = new Account(deposit, this.market.start);
+    this.account = exchange.createAccount(deposit, exchange.start);
   }
 
   /** Buy all positions advised by strategy */
@@ -37,7 +34,7 @@ export class Simulation {
     const today: StrategyContext = {
       amount,
       bar,
-      instruments: this.market.on(bar),
+      instruments: this.exchange.on(bar),
       positions: this.account.positions,
     };
 
@@ -46,7 +43,7 @@ export class Simulation {
     for (const order of orders) {
       const position = this.exchange.buy(order.instrument, order.amount, bar);
       this.account.add(position, order.amount, bar);
-      ++this.performance.buys;
+      // ++this.performance.buys;
     }
   }
 
@@ -55,7 +52,7 @@ export class Simulation {
     const today: StrategyContext = {
       amount: this.account.balance,
       bar,
-      instruments: this.market.on(bar),
+      instruments: this.exchange.on(bar),
       positions: this.account.positions,
     };
 
@@ -64,7 +61,7 @@ export class Simulation {
     for (const position of positions) {
       const amount = this.exchange.sell(position, bar);
       this.account.remove(position, amount, bar);
-      ++this.performance.sells;
+      // ++this.performance.sells;
     }
   }
 
@@ -72,12 +69,12 @@ export class Simulation {
   private step(bar: Bar): void {
     this.sell(bar);
     this.buy(bar);
-    ++this.performance.steps;
+    // ++this.performance.steps;
   }
 
   /** Run steps of simulation from start to end */
   public run(): void {
-    let bar: Bar = this.market.start;
-    while (bar >= this.market.end) this.step(bar--);
+    let bar: Bar = this.exchange.start;
+    while (bar >= this.exchange.end) this.step(bar--);
   }
 }

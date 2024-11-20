@@ -3,6 +3,8 @@ import { Portfolio } from "./portfolio.ts";
 import type { Position } from "./position.ts";
 import type { Amount, Bar, Price } from "./types.ts";
 import { Chart } from "./chart.ts";
+import type { Exchange } from "./exchange.ts";
+import { Trade } from "./trade.ts";
 
 type Transaction = {
   bar: Bar;
@@ -13,6 +15,8 @@ type Transaction = {
   invested: Amount;
   cash: Amount;
 };
+
+type Trades = Array<Trade>;
 
 /** A list of transaction */
 class Journal {
@@ -28,10 +32,11 @@ class Journal {
     const bar: Bar = transaction.bar;
     const last: Transaction = this.last;
     /** Ensure transaction only roll forward in time, ie. bar <= bar.index */
-    if (last?.bar && bar > last.bar)
+    if (last?.bar && bar > last.bar) {
       throw new Error(
-        `Transaction at bar ${bar} added before newest bar ${last.bar}.`
+        `Transaction at bar ${bar} added before newest bar ${last.bar}.`,
       );
+    }
     this.list.push(transaction);
   }
 }
@@ -43,12 +48,19 @@ export class Account {
   /** Collection of positions */
   public readonly portfolio: Portfolio = new Portfolio();
 
+  /** List of completed trades */
+  public readonly trades: Trades = [];
+
   /** Valuation */
   public readonly valuation: Chart;
 
   /** Optionally deposit an amount at account opening */
   // TODO: Provide exhange with fee policy
-  constructor(deposit: number = 0, bar: Bar = 0) {
+  constructor(
+    private readonly exchange: Exchange,
+    deposit: number = 0,
+    bar: Bar = 0,
+  ) {
     this.valuation = new Chart([deposit], bar);
     if (deposit != 0) this.deposit(deposit, bar);
   }
@@ -61,16 +73,18 @@ export class Account {
   /** Valuation at each bar */
   private valuate(bar: Bar): void {
     const end = this.valuation.end;
-    if (bar > end)
+    if (bar > end) {
       throw new Error(
-        `Valuation at new bar ${bar} is prior to latest bar ${end}`
+        `Valuation at new bar ${bar} is prior to latest bar ${end}`,
       );
+    }
     if (bar == end) return;
 
     // Catch up until bar
     const cash = this.balance;
-    for (let index = end - 1; index >= bar; index--)
+    for (let index = end - 1; index >= bar; index--) {
       this.valuation.add(cash + this.portfolio.value(index));
+    }
   }
 
   /** Deposit an amount to account */
@@ -143,6 +157,10 @@ export class Account {
       cash: prev.cash + amount,
     };
     this.journal.push(transaction);
+
+    // Record completed trade
+    const trade = new Trade(position, bar, amount);
+    this.trades.push(trade);
 
     return true;
   }

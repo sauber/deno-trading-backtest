@@ -1,27 +1,45 @@
 import { Exchange } from "./exchange.ts";
-import type { Instrument } from "./types.ts";
-import { makeInstrument } from "./testdata.ts";
+import { makeInstruments } from "./testdata.ts";
+import {
+  assertAlmostEquals,
+  assertGreater,
+  assertInstanceOf,
+} from "@std/assert";
+import { Account } from "./account.ts";
+import type { Amount, Bar, Instrument } from "./types.ts";
 import type { Position } from "./position.ts";
-import { assertAlmostEquals, assertInstanceOf } from "@std/assert";
+
+const instruments = makeInstruments(3);
 
 Deno.test("Instance", () => {
-  const ex = new Exchange();
+  const ex = new Exchange(instruments);
   assertInstanceOf(ex, Exchange);
 });
 
-Deno.test("Buy", () => {
-  const ex = new Exchange();
-  const instr: Instrument = makeInstrument();
-  const amount = 1000;
-  const position: Position = ex.buy(instr, amount);
-  assertAlmostEquals(position.price * position.units, amount);
+Deno.test("Dates", () => {
+  const ex = new Exchange(instruments);
+  assertGreater(ex.start, ex.end);
 });
 
-Deno.test("Sell", () => {
-  const ex = new Exchange();
-  const instr: Instrument = makeInstrument();
-  const buying = 1000;
-  const position: Position = ex.buy(instr, buying);
-  const selling = ex.sell(position);
-  assertAlmostEquals(selling, buying);
+Deno.test("Create Account", () => {
+  const ex = new Exchange(instruments);
+  const ac: Account = ex.createAccount();
+  assertInstanceOf(ac, Account);
+});
+
+Deno.test("Buy and selling", () => {
+  const ex = new Exchange(instruments);
+
+  const start: Bar = 0;
+  const instr: Instrument = ex.on(start)[0];
+  const amount: Amount = 1000;
+  const position: Position = ex.buy(instr, amount, start);
+  assertAlmostEquals(position.price * position.units, amount);
+
+  const end: Bar = 0;
+  const returns: Amount = ex.sell(position, end);
+
+  // Selling at same bar as buying should return same amount as invested,
+  // when trading is free of fees.
+  assertAlmostEquals(returns, amount);
 });
