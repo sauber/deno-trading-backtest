@@ -1,4 +1,7 @@
-import { TestInstrument } from "./src/testdata.ts";
+import { Simulation } from "./mod.ts";
+import { makeExchange, TestStrategy } from "./src/testdata.ts";
 
-const instr1 = new TestInstrument;
-console.log(instr1.plot());
+const simulation = new Simulation(makeExchange(5), new TestStrategy());
+simulation.run();
+console.log(simulation.account.statement);
+console.log(simulation.account.portfolio.statement);
