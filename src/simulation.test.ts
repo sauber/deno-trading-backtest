@@ -15,7 +15,7 @@ Deno.test("Steps", () => {
   const s = new Simulation(ex, new TestStrategy());
   // assertEquals(s.performance.steps, 0);
   s.run();
-  const days: number = ex.start - ex.end;
+  // const days: number = ex.start - ex.end;
   // assertEquals(s.performance.steps, days + 1);
 });
 

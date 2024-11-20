@@ -3,7 +3,7 @@ import { Account } from "./account.ts";
 import { makeInstruments, makePosition } from "./testdata.ts";
 import { Exchange } from "./exchange.ts";
 import type { Amount, Bar } from "./types.ts";
-import { Position } from "./position.ts";
+import type { Position } from "./position.ts";
 
 const ex: Exchange = new Exchange(makeInstruments(3));
 
