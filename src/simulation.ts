@@ -1,18 +1,13 @@
 import type { Account } from "./account.ts";
 import type { Exchange } from "./exchange.ts";
 import type { Positions } from "./position.ts";
+import { Stats } from "./stats.ts";
 import type {
   Bar,
   PurchaseOrders,
   Strategy,
   StrategyContext,
 } from "./types.ts";
-
-// type Performance = {
-//   steps: number;
-//   buys: number;
-//   sells: number;
-// };
 
 export class Simulation {
   public readonly account: Account;
@@ -43,7 +38,6 @@ export class Simulation {
     for (const order of orders) {
       const position = this.exchange.buy(order.instrument, order.amount, bar);
       this.account.add(position, order.amount, bar);
-      // ++this.performance.buys;
     }
   }
 
@@ -61,20 +55,25 @@ export class Simulation {
     for (const position of positions) {
       const amount = this.exchange.sell(position, bar);
       this.account.remove(position, amount, bar);
-      // ++this.performance.sells;
     }
   }
 
   /** Perform one step of simulation */
   private step(bar: Bar): void {
+    // TODO: expire previous bar
     this.sell(bar);
     this.buy(bar);
-    // ++this.performance.steps;
   }
 
   /** Run steps of simulation from start to end */
   public run(): void {
     let bar: Bar = this.exchange.start;
     while (bar >= this.exchange.end) this.step(bar--);
+    this.account.withdraw(0, this.exchange.end); // Ensure valuation until end
+  }
+
+  /** Stats from simulation */
+  public get stats(): Stats {
+    return new Stats(this.account);
   }
 }
