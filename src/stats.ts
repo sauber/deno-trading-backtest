@@ -1,5 +1,5 @@
 import type { Account, Trades } from "./account.ts";
-import { type Chart, SharpeRatio } from "./chart.ts";
+import { type Chart, OmegaRatio } from "./chart.ts";
 
 /** Calculate trading performance from an account */
 export class Stats {
@@ -12,8 +12,8 @@ export class Stats {
   }
 
   /** SharpeRatio of account value */
-  public get sharperatio(): number {
-    return SharpeRatio(this.account.valuation);
+  public get omegaRatio(): number {
+    return OmegaRatio(this.account.valuation);
   }
 
   /** List of completed trades */

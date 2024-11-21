@@ -25,7 +25,7 @@ Deno.test("Bars from first to last activity", () => {
   assertEquals(stats.bars, 11);
 });
 
-Deno.test("SharpeRatio", () => {
+Deno.test("Omega Ratio", () => {
   const instr: Instrument = ex.any();
   const start: Bar = instr.start;
   const end: Bar = instr.end;
@@ -40,7 +40,7 @@ Deno.test("SharpeRatio", () => {
 
   // Generate stats
   const stats = new Stats(account);
-  assertNotEquals(stats.sharperatio, 0);
+  assertNotEquals(stats.omegaRatio, 0);
 });
 
 Deno.test("Trade Count", () => {

@@ -1,5 +1,5 @@
 import { assertEquals, assertInstanceOf, assertThrows } from "@std/assert";
-import { Chart, Returns, SharpeRatio } from "./chart.ts";
+import { Chart, OmegaRatio, Returns } from "./chart.ts";
 
 Deno.test("Instance", () => {
   assertInstanceOf(new Chart(), Chart);
@@ -39,20 +39,20 @@ Deno.test("Add value", () => {
 });
 
 Deno.test("Returns", () => {
-  const c = new Chart([0, 1, 2], 3);
+  const c = new Chart([1, 2, 3], 3);
   const r = Returns(c);
-  assertEquals(r.values, [1, 1]);
+  assertEquals(r.values, [1, 0.5]);
   assertEquals(r.end, 3);
 });
 
-Deno.test("SharpeRatio", () => {
-  // Positive sharperatio
-  const p: Chart = new Chart([0, 1, 3]);
-  const psr: number = SharpeRatio(p);
-  assertEquals(psr, 3);
+Deno.test("Omega Ratio", () => {
+  // Positive ratio
+  const p: Chart = new Chart([0, 1, 3, 2]);
+  const psr: number = OmegaRatio(p);
+  assertEquals(psr, 2);
 
-  // Negative sharperatio
-  const n = new Chart([3, 1, 0], 3);
-  const nsr = SharpeRatio(n);
-  assertEquals(nsr, -0.75);
+  // Negative ratio
+  const n = new Chart([3, 1, 0, 1]);
+  const nsr = OmegaRatio(n);
+  assertEquals(nsr, 0.5);
 });
