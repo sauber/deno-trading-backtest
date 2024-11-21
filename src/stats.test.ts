@@ -1,4 +1,4 @@
-import { assertEquals, assertInstanceOf } from "@std/assert";
+import { assertEquals, assertInstanceOf, assertNotEquals } from "@std/assert";
 import { Stats } from "./stats.ts";
 import { Account } from "./account.ts";
 import { makeExchange } from "./testdata.ts";
@@ -42,5 +42,5 @@ Deno.test("SharpeRatio", () => {
 
   // Generate stats
   const s = new Stats(account);
-  console.log(s.sharperatio);
+  assertNotEquals(s.sharperatio, 0);
 });
