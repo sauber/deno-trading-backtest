@@ -1,4 +1,3 @@
-import { std } from "@sauber/statistics";
 import type { Bar, Price } from "./types.ts";
 
 type Series = Array<Price>;
@@ -76,14 +75,14 @@ export function Returns(chart: Chart): Chart {
   return new Chart(output, chart.end);
 }
 
-/** Calculate ratio of gains vs losses */
+/** Calculate ratio of total of gains vs total of losses */
 export function OmegaRatio(chart: Chart): number {
   let [gain, loss] = [0, 0];
   const series = chart.series;
-  for (let i = 0; i < series.length; i++) {
+  for (let i = 0; i < series.length - 1; i++) {
     const diff = series[i + 1] - series[i];
-    if (diff > 0) gain++;
-    else if (diff <= 0) loss++;
+    if (diff > 0) gain += diff;
+    else if (diff <= 0) loss -= diff;
   }
   return gain / loss;
 }

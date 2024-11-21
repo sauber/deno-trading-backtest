@@ -49,10 +49,10 @@ Deno.test("Omega Ratio", () => {
   // Positive ratio
   const p: Chart = new Chart([0, 1, 3, 2]);
   const psr: number = OmegaRatio(p);
-  assertEquals(psr, 2);
+  assertEquals(psr, 3);
 
   // Negative ratio
   const n = new Chart([3, 1, 0, 1]);
   const nsr = OmegaRatio(n);
-  assertEquals(nsr, 0.5);
+  assertEquals(nsr, 1 / 3);
 });
