@@ -16,7 +16,7 @@ type Transaction = {
   cash: Amount;
 };
 
-type Trades = Array<Trade>;
+export type Trades = Array<Trade>;
 
 /** A consecutive list of transactions */
 class Journal {

@@ -11,6 +11,6 @@ export class Trade {
 
     /** Number for bars from start to end */
     public get length(): number {
-        return 0;
+        return this.position.start - this.end;
     }
 }
