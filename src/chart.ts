@@ -1,4 +1,4 @@
-import { avg, std } from "@sauber/statistics";
+import { std } from "@sauber/statistics";
 import type { Bar, Price } from "./types.ts";
 
 type Series = Array<Price>;

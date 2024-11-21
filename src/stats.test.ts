@@ -2,6 +2,8 @@ import { assertEquals, assertInstanceOf } from "@std/assert";
 import { Stats } from "./stats.ts";
 import { Account } from "./account.ts";
 import { makeExchange } from "./testdata.ts";
+import type { Amount, Bar, Instrument } from "./types.ts";
+import type { Position } from "./position.ts";
 
 const ex = makeExchange(3);
 
@@ -23,22 +25,22 @@ Deno.test("Bars from first to last activity", () => {
   assertEquals(s.bars, 11);
 });
 
-// Deno.test("Profit", () => {
-//   const s = new Stats();
-//   assertEquals(s.profit, 0);
-//   s.tick({ cash: 2, invested: 0, profit: 0 });
-//   assertEquals(s.profit, 0);
-//   s.tick({ cash: 4, invested: 0, profit: 0 });
-//   assertEquals(s.profit, 1);
-// });
+Deno.test("SharpeRatio", () => {
+  const instr: Instrument = ex.any();
+  const start: Bar = instr.start;
+  const end: Bar = instr.end;
+  const deposit: Amount = 1000;
+  const account = new Account(ex, deposit, start);
 
-// Deno.test("Winratio", () => {
-//   const s = new Stats();
-//   assertEquals(s.winratio, undefined);
-//   s.trade(new Date(), new Date(), 0, 0);
-//   assertEquals(s.winratio, undefined);
-//   s.trade(new Date(), new Date(), 0, 1);
-//   assertEquals(s.winratio, 1);
-//   s.trade(new Date(), new Date(), 1, 0);
-//   assertEquals(s.winratio, 0.5);
-// });
+  // Open position
+  const position: Position = ex.buy(instr, deposit, start);
+  account.add(position, deposit, start);
+
+  // Close position
+  const returned: Amount = ex.sell(position, end);
+  account.remove(position, returned, end);
+
+  // Generate stats
+  const s = new Stats(account);
+  console.log(s.sharperatio);
+});

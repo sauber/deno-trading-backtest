@@ -23,6 +23,10 @@ export class Exchange {
     return new Account(this, deposit, start);
   }
 
+  public any(): Instrument {
+    return this.instruments[Math.floor(Math.random()*this.instruments.length)];
+  }
+
   /** Instruments available at bar */
   public on(bar: Bar): Instruments {
     return this.instruments.filter((i) => i.active(bar));

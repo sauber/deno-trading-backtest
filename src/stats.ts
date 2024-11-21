@@ -1,5 +1,5 @@
 import type { Account } from "./account.ts";
-import type { Chart } from "./chart.ts";
+import { SharpeRatio, type Chart } from "./chart.ts";
 
 /** Calculate trading performance from an account */
 export class Stats {
@@ -9,5 +9,9 @@ export class Stats {
   public get bars(): number {
     const chart: Chart = this.account.valuation;
     return chart.start - chart.end + 1;
+  }
+
+  public get sharperatio(): number {
+    return SharpeRatio(this.account.valuation);
   }
 }

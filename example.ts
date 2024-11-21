@@ -1,5 +1,5 @@
 import { Simulation } from "./mod.ts";
-import { Exchange } from "./src/exchange.ts";
+import type { Exchange } from "./src/exchange.ts";
 import { makeExchange, TestStrategy } from "./src/testdata.ts";
 
 const exchange: Exchange = makeExchange(5);
