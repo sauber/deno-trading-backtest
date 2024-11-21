@@ -1,6 +1,7 @@
 {
-  "name": "@sauber/trading-backtest",
-  "version": "0.1.0",
+  "name": "@sauber/backtest",
+  "version": "0.1.1",
+  "license": "MIT",
   "exports": "./mod.ts",
   "lock": false,
   "publish": {
