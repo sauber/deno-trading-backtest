@@ -1,12 +1,13 @@
 import {
+  assertAlmostEquals,
   assertEquals,
   assertGreater,
   assertInstanceOf,
-  assertNotEquals,
 } from "@std/assert";
 import { Portfolio } from "./portfolio.ts";
 import type { Position } from "./position.ts";
 import { makePosition } from "./testdata.ts";
+import type { Amount } from "./types.ts";
 
 Deno.test("Instance", () => {
   const p = new Portfolio();
@@ -33,29 +34,27 @@ Deno.test("Amount invested", () => {
   assertEquals(portfolio.invested, 2 * amount);
 });
 
-// Deno.test("Profit", () => {
-//   const portfolio = new Portfolio();
-//   const amount = 100;
-//   portfolio.add(makePosition(amount));
-//   portfolio.add(makePosition(amount));
-//   assertNotEquals(portfolio.profit(), 0);
-// });
-
 Deno.test("Value", () => {
   const portfolio = new Portfolio();
-  const amount = 100;
-  portfolio.add(makePosition(amount));
-  portfolio.add(makePosition(amount));
-  const value = portfolio.value();
-  assertNotEquals(value, amount);
+  const amount: Amount = 100;
+  const position: Position = makePosition(amount);
+  portfolio.add(position);
+  const value = portfolio.value(position.instrument.start);
+  assertAlmostEquals(value, amount);
+  portfolio.add(position);
+  const value2 = portfolio.value(position.instrument.start);
+  assertAlmostEquals(value2, amount * 2);
 });
 
 Deno.test("Statement", () => {
   const portfolio = new Portfolio();
-  const amount = 100;
-  portfolio.add(makePosition(amount));
-  portfolio.add(makePosition(amount));
+  const amount: Amount = 100;
+  const position: Position = makePosition(amount);
 
-  const printable = portfolio.statement;
+  portfolio.add(position);
+  portfolio.add(position);
+
+  const printable = portfolio.statement(position.instrument.end);
+  // console.log(printable);
   assertGreater(printable.length, 0);
 });

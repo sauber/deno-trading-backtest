@@ -33,12 +33,10 @@ Deno.test("SharpeRatio", () => {
   const account = new Account(ex, deposit, start);
 
   // Open position
-  const position: Position = ex.buy(instr, deposit, start);
-  account.add(position, deposit, start);
+  const position = account.add(instr, deposit, start) as Position;
 
   // Close position
-  const returned: Amount = ex.sell(position, end);
-  account.remove(position, returned, end);
+  account.remove(position, end);
 
   // Generate stats
   const s = new Stats(account);

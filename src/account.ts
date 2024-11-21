@@ -1,7 +1,7 @@
 import { Table } from "@sauber/table";
 import { Portfolio } from "./portfolio.ts";
 import type { Position } from "./position.ts";
-import type { Amount, Bar, Price } from "./types.ts";
+import type { Amount, Bar, Instrument, Price } from "./types.ts";
 import { Chart } from "./chart.ts";
 import type { Exchange } from "./exchange.ts";
 import { Trade } from "./trade.ts";
@@ -118,12 +118,15 @@ export class Account {
 
   /** Add position to portfolio, deduct payment from cash */
   // TODO: Convert amount to position on exchange
-  public add(position: Position, amount: number, bar: Bar = 0): boolean {
-    this.valuate(bar);
+  public add(instrument: Instrument, amount: Amount, bar: Bar = 0): Position|undefined {
     // Cannot open unfunded position
     const prev = this.journal.last;
-    if (amount > prev.cash) return false;
+    if (amount > prev.cash) return;
 
+    // Let Exchange create position
+    const position = this.exchange.buy(instrument, amount, bar);
+
+    this.valuate(bar);
     this.portfolio.add(position);
     const transaction: Transaction = {
       bar,
@@ -136,17 +139,20 @@ export class Account {
     };
     this.journal.push(transaction);
 
-    return true;
+    return position;
   }
 
   /** Remove position from portfolio, add return to cash */
   // Get amount from exchange transaction
-  public remove(position: Position, amount: number, bar: Bar = 0): boolean {
+  public remove(position: Position, bar: Bar = 0): boolean {
     // console.log(bar, 'account remove', position.print());
-    this.valuate(bar);
     // Only close if actually in portfolio
     if (!this.portfolio.has(position)) return false;
 
+    // Let exchange return amount from position
+    const amount: Amount = this.exchange.sell(position, bar);
+
+    this.valuate(bar);
     this.portfolio.remove(position);
     const prev = this.journal.last;
     const transaction: Transaction = {

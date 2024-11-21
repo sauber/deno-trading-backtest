@@ -30,14 +30,13 @@ Deno.test("Create Account", () => {
 Deno.test("Buy and selling", () => {
   const ex = new Exchange(instruments);
 
-  const start: Bar = 0;
-  const instr: Instrument = ex.on(start)[0];
+  const instr: Instrument = ex.any();
+  const start: Bar = instr.start;
   const amount: Amount = 1000;
   const position: Position = ex.buy(instr, amount, start);
   assertAlmostEquals(position.price * position.units, amount);
 
-  const end: Bar = 0;
-  const returns: Amount = ex.sell(position, end);
+  const returns: Amount = ex.sell(position, start);
 
   // Selling at same bar as buying should return same amount as invested,
   // when trading is free of fees.

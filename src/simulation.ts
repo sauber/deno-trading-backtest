@@ -16,7 +16,7 @@ export class Simulation {
   constructor(
     private readonly exchange: Exchange,
     private readonly strategy: Strategy,
-    private deposit: number = 10000,
+    deposit: number = 10000,
   ) {
     this.account = exchange.createAccount(deposit, exchange.start);
   }
@@ -29,11 +29,7 @@ export class Simulation {
 
     for (const position of positions) {
       if (!available.includes(position.instrument)) {
-        // console.log(bar, "simulation expire remove", position.print());
-        const amount = this.exchange.sell(position, bar + 1);
-        this.account.remove(position, amount, bar + 1);
-      } else {
-        // console.log(bar, "simulation expire keep", position.print());
+        this.account.remove(position, bar + 1);
       }
     }
     // console.log(bar, "simulation expire positions after removal:", this.account.positions.length);
@@ -55,9 +51,7 @@ export class Simulation {
     const orders: PurchaseOrders = this.strategy.open(today);
 
     for (const order of orders) {
-      const position = this.exchange.buy(order.instrument, order.amount, bar);
-      // console.log(bar, "simulation buy", position.print());
-      this.account.add(position, order.amount, bar);
+      this.account.add(order.instrument, order.amount, bar);
     }
   }
 
@@ -73,9 +67,7 @@ export class Simulation {
     const positions: Positions = this.strategy.close(today);
 
     for (const position of positions) {
-      // console.log(bar, "simulation sell", position.print());
-      const amount = this.exchange.sell(position, bar);
-      this.account.remove(position, amount, bar);
+      this.account.remove(position, bar);
     }
   }
 

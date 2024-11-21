@@ -2,8 +2,8 @@ import { assertEquals, assertInstanceOf } from "@std/assert";
 import { Account } from "./account.ts";
 import { makeInstruments, makePosition } from "./testdata.ts";
 import { Exchange } from "./exchange.ts";
-import type { Amount, Bar } from "./types.ts";
-import type { Position } from "./position.ts";
+import type { Amount, Bar, Instrument } from "./types.ts";
+import { Position } from "./position.ts";
 
 const ex: Exchange = new Exchange(makeInstruments(3));
 
@@ -40,30 +40,34 @@ Deno.test("Withdrawals", () => {
 Deno.test("Open", () => {
   const deposit: Amount = 2000;
   const amount: Amount = 100;
-  const account = new Account(ex, deposit);
-  const pos: Position = makePosition(amount);
-  const success: boolean = account.add(pos, amount);
-  assertEquals(success, true);
+  const instrument: Instrument = ex.any();
+  const start: Bar = instrument.start;
+  const account = new Account(ex, deposit, start);
+  const position = account.add(instrument, amount, start);
+  assertInstanceOf(position, Position);
   assertEquals(account.balance, deposit - amount);
 });
 
 Deno.test("Open exceeds funds", () => {
   const deposit: Amount = 2000;
   const amount: Amount = 2001;
-  const account = new Account(ex, deposit);
-  const pos: Position = makePosition(amount);
-  const success: boolean = account.add(pos, amount);
-  assertEquals(success, false);
+  const instrument: Instrument = ex.any();
+  const start: Bar = instrument.start;
+  const account = new Account(ex, deposit, start);
+  const position = account.add(instrument, amount, start);
+  assertEquals(position, undefined);
   assertEquals(account.balance, deposit);
 });
 
 Deno.test("Close", () => {
   const deposit: Amount = 2000;
   const amount: Amount = 100;
-  const account = new Account(ex, deposit);
-  const pos: Position = makePosition(amount);
-  account.add(pos, amount);
-  account.remove(pos, amount);
+  const instrument: Instrument = ex.any();
+  const start: Bar = instrument.start;
+  const account = new Account(ex, deposit, start);
+  const position = account.add(instrument, amount, start);
+  assertInstanceOf(position, Position);
+  account.remove(position, start);
   assertEquals(account.balance, deposit);
 });
 
