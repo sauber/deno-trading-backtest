@@ -25,17 +25,13 @@ export class Position {
 
   /** Value of investment at bar */
   public value(bar: Bar = 0): Amount {
-    // console.log(bar, 'position value', this.print());
     return this.units * this.instrument.price(bar);
   }
 
-  /** Profit of investment at time */
-  // public profit(index: Bar = 0): Amount {
-  //   return this.value(index) - this.invested;
-  // }
-
-  /** Represent position as string */
+  /** Represent position data as string */
   public print(): string {
-    return `${this.instrument.symbol}/${this.amount.toFixed(2)} [${this.instrument.start}-${this.start}-${this.instrument.end}]`;
+    return `${this.instrument.symbol}/${
+      this.amount.toFixed(2)
+    } [${this.instrument.start}-${this.start}-${this.instrument.end}]`;
   }
 }

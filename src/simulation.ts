@@ -24,15 +24,10 @@ export class Simulation {
   /** Expire all positions no longer having data at bar */
   private expire(bar: Bar): void {
     const available: Instruments = this.exchange.on(bar);
-    const positions: Positions = [...this.account.positions]; // Clone before splicing
-    // console.log(bar, "simulation expire", {available: available.length, positions: positions.length});
-
-    for (const position of positions) {
-      if (!available.includes(position.instrument)) {
-        this.account.remove(position, bar + 1);
-      }
-    }
-    // console.log(bar, "simulation expire positions after removal:", this.account.positions.length);
+    const expired: Positions = this.account.positions.filter((position) =>
+      !available.includes(position.instrument)
+    );
+    for (const position of expired) this.account.remove(position, bar + 1);
   }
 
   /** Buy all positions advised by strategy */

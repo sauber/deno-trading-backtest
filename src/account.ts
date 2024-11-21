@@ -18,7 +18,7 @@ type Transaction = {
 
 type Trades = Array<Trade>;
 
-/** A list of transaction */
+/** A consecutive list of transactions */
 class Journal {
   public readonly list: Array<Transaction> = [];
 
@@ -41,7 +41,7 @@ class Journal {
   }
 }
 
-/** Journal of transactions */
+/** An account belonging to Exchange */
 export class Account {
   private readonly journal = new Journal();
 
@@ -55,7 +55,6 @@ export class Account {
   public readonly valuation: Chart;
 
   /** Optionally deposit an amount at account opening */
-  // TODO: Provide exhange with fee policy
   constructor(
     private readonly exchange: Exchange,
     deposit: number = 0,
@@ -83,7 +82,6 @@ export class Account {
     // Catch up until bar
     const cash = this.balance;
     for (let index = end - 1; index >= bar; index--) {
-      // console.log(index, 'account valuation');
       this.valuation.add(cash + this.portfolio.value(index));
     }
   }
@@ -117,8 +115,11 @@ export class Account {
   }
 
   /** Add position to portfolio, deduct payment from cash */
-  // TODO: Convert amount to position on exchange
-  public add(instrument: Instrument, amount: Amount, bar: Bar = 0): Position|undefined {
+  public add(
+    instrument: Instrument,
+    amount: Amount,
+    bar: Bar = 0,
+  ): Position | undefined {
     // Cannot open unfunded position
     const prev = this.journal.last;
     if (amount > prev.cash) return;
@@ -145,7 +146,6 @@ export class Account {
   /** Remove position from portfolio, add return to cash */
   // Get amount from exchange transaction
   public remove(position: Position, bar: Bar = 0): boolean {
-    // console.log(bar, 'account remove', position.print());
     // Only close if actually in portfolio
     if (!this.portfolio.has(position)) return false;
 
@@ -173,7 +173,7 @@ export class Account {
     return true;
   }
 
-  /** Oositions in portfolio */
+  /** Positions in portfolio */
   public get positions(): Array<Position> {
     return this.portfolio.positions;
   }

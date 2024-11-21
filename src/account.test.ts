@@ -1,6 +1,6 @@
 import { assertEquals, assertInstanceOf } from "@std/assert";
 import { Account } from "./account.ts";
-import { makeInstruments, makePosition } from "./testdata.ts";
+import { makeInstruments } from "./testdata.ts";
 import { Exchange } from "./exchange.ts";
 import type { Amount, Bar, Instrument } from "./types.ts";
 import { Position } from "./position.ts";

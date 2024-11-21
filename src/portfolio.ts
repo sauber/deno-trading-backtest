@@ -37,18 +37,9 @@ export class Portfolio {
     );
   }
 
-  /** Total unrealized profit of all positions */
-  // public profit(index: Bar = 0): number {
-  //   return this.positions.reduce(
-  //     (sum: number, p: Position) => sum + p.profit(index),
-  //     0
-  //   );
-  // }
 
   /** Total unrealized value of all positions */
   public value(index: Bar = 0): number {
-    // for ( const pos of this.positions) console.log(index, 'portfolio value', pos.print());
-    
     return this.positions.reduce(
       (sum: number, p: Position) => sum + p.value(index),
       0,
@@ -58,7 +49,6 @@ export class Portfolio {
   /** Printable statement */
   public statement(bar: Bar): string {
     const money = (v: number): number => parseFloat(v.toFixed(2));
-    // const now: Date = new Date();
     const t = new Table();
     t.headers = [
       "Symbol",
