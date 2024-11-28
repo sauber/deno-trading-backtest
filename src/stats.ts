@@ -1,3 +1,4 @@
+import { avg } from "@sauber/statistics";
 import type { Account, Trades } from "./account.ts";
 import type { Chart } from "./chart.ts";
 
@@ -30,7 +31,17 @@ export class Stats {
       move += Math.abs(diff);
       if (diff >= 0) gain += diff;
     }
-    if ( move === 0 ) return 0;
+    if (move === 0) return 0;
     return gain / move;
+  }
+
+  /** On average, of total value how much is invested */
+  public get InvestedRatio(): number {
+    const value: Array<number> = this.account.valuation.series;
+    const equity: Array<number> = this.account.equity.series;
+    const ratios: Array<number> = Array(value.length);
+    for (let i = 0; i < value.length; i++) ratios[i] = equity[i] / value[i];
+    const r = avg(ratios);
+    return r;
   }
 }

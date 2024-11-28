@@ -51,8 +51,11 @@ export class Account {
   /** List of completed trades */
   public readonly trades: Trades = [];
 
-  /** Valuation */
+  /** Total valuation daily chart */
   public readonly valuation: Chart;
+
+  /** Daily value of investment */
+  public readonly equity: Chart;
 
   /** Optionally deposit an amount at account opening */
   constructor(
@@ -61,6 +64,7 @@ export class Account {
     bar: Bar = 0,
   ) {
     this.valuation = new Chart([deposit], bar);
+    this.equity = new Chart([0], bar);
     if (deposit != 0) this.deposit(deposit, bar);
   }
 
@@ -82,7 +86,9 @@ export class Account {
     // Catch up until bar
     const cash = this.balance;
     for (let index = end - 1; index >= bar; index--) {
-      this.valuation.add(cash + this.portfolio.value(index));
+      const equity: number = this.portfolio.value(index);
+      this.equity.add(equity);
+      this.valuation.add(cash + equity);
     }
   }
 

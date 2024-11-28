@@ -79,3 +79,24 @@ Deno.test("WinRatio", () => {
   assertGreater(stats.WinRatio, 0);
   assertLess(stats.WinRatio, 1);
 });
+
+Deno.test("InvestedRatio", () => {
+  const instr: Instrument = ex.any();
+  const start: Bar = instr.start;
+  const end: Bar = instr.end;
+  const deposit: Amount = 1000;
+  const account: Account = ex.createAccount(deposit, start);
+  const stats = new Stats(account);
+  assertEquals(stats.InvestedRatio, 0);
+
+  // Open position
+  const position = account.add(instr, deposit, start) as Position;
+  assertEquals(stats.InvestedRatio, 0);
+
+  // Close position
+  account.remove(position, end);
+  const ir = stats.InvestedRatio;
+  assertGreater(ir, 0);
+  assertLess(ir, 1);
+});
+
