@@ -1,4 +1,4 @@
-import { assertEquals, assertInstanceOf, assertNotEquals } from "@std/assert";
+import { assertEquals, assertGreater, assertInstanceOf, assertLess, assertNotEquals } from "@std/assert";
 import { Stats } from "./stats.ts";
 import type { Account } from "./account.ts";
 import { makeExchange } from "./testdata.ts";
@@ -23,24 +23,6 @@ Deno.test("Bars from first to last activity", () => {
   account.withdraw(1000, 0);
   const stats = new Stats(account);
   assertEquals(stats.bars, 11);
-});
-
-Deno.test("Omega Ratio", () => {
-  const instr: Instrument = ex.any();
-  const start: Bar = instr.start;
-  const end: Bar = instr.end;
-  const deposit: Amount = 1000;
-  const account: Account = ex.createAccount(deposit, start);
-
-  // Open position
-  const position = account.add(instr, deposit, start) as Position;
-
-  // Close position
-  account.remove(position, end);
-
-  // Generate stats
-  const stats = new Stats(account);
-  assertNotEquals(stats.omegaRatio, 0);
 });
 
 Deno.test("Trade Count", () => {
@@ -77,4 +59,23 @@ Deno.test("Profit", () => {
   // Close position
   account.remove(position, end);
   assertNotEquals(stats.profit, 0);
+});
+
+Deno.test("WinRatio", () => {
+  const instr: Instrument = ex.any();
+  const start: Bar = instr.start;
+  const end: Bar = instr.end;
+  const deposit: Amount = 1000;
+  const account: Account = ex.createAccount(deposit, start);
+  const stats = new Stats(account);
+  assertEquals(stats.WinRatio, 0);
+
+  // Open position
+  const position = account.add(instr, deposit, start) as Position;
+  assertEquals(stats.WinRatio, 0);
+
+  // Close position
+  account.remove(position, end);
+  assertGreater(stats.WinRatio, 0);
+  assertLess(stats.WinRatio, 1);
 });

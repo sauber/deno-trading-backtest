@@ -65,24 +65,3 @@ export class Chart {
   }
 }
 
-/** Generate new chart of returns as ratio of input */
-export function Returns(chart: Chart): Chart {
-  const input = chart.values;
-  const output = Array(input.length - 1);
-  for (let i = 0; i < output.length; i++) {
-    output[i] = (input[i + 1] - input[i]) / input[i];
-  }
-  return new Chart(output, chart.end);
-}
-
-/** Calculate ratio of total of gains vs total of losses */
-export function OmegaRatio(chart: Chart): number {
-  let [gain, loss] = [0, 0];
-  const series = chart.series;
-  for (let i = 0; i < series.length - 1; i++) {
-    const diff = series[i + 1] - series[i];
-    if (diff > 0) gain += diff;
-    else if (diff <= 0) loss -= diff;
-  }
-  return gain / loss;
-}
