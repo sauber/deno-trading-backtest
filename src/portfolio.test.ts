@@ -5,9 +5,9 @@ import {
   assertInstanceOf,
 } from "@std/assert";
 import { Portfolio } from "./portfolio.ts";
-import type { Position } from "./position.ts";
-import { makePosition } from "./testdata.ts";
-import type { Amount } from "./types.ts";
+import { Position } from "./position.ts";
+import { makeInstrument, makePosition } from "./testdata.ts";
+import type { Amount, Bar, Instrument, Price } from "./types.ts";
 
 Deno.test("Instance", () => {
   const p = new Portfolio();
@@ -37,12 +37,18 @@ Deno.test("Amount invested", () => {
 Deno.test("Value", () => {
   const portfolio = new Portfolio();
   const amount: Amount = 100;
-  const position: Position = makePosition(amount);
-  portfolio.add(position);
-  const value = portfolio.value(position.instrument.start);
+  const instrument: Instrument = makeInstrument();
+  const date: Bar = instrument.start;
+  const price: Price = instrument.price(date);
+  const units: number = amount / price;
+  const position1 = new Position(instrument, amount, price, units, date, 1);
+  portfolio.add(position1);
+  const value = portfolio.value(date);
   assertAlmostEquals(value, amount);
-  portfolio.add(position);
-  const value2 = portfolio.value(position.instrument.start);
+
+  const position2 = new Position(instrument, amount, price, units, date, 2);
+  portfolio.add(position2);
+  const value2 = portfolio.value(date);
   assertAlmostEquals(value2, amount * 2);
 });
 

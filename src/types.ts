@@ -9,6 +9,9 @@ export type Amount = number;
 /** A price of an instrument at a time */
 export type Price = number;
 
+/** ID of position */
+export type PositionID = number;
+
 /** An instrument tradeable on exchange */
 export type Instrument = {
   // Name of instrument

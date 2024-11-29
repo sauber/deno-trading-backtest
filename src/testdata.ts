@@ -155,6 +155,7 @@ export function makePosition(amount: number): Position {
     price,
     amount / price,
     instr.start,
+    Math.floor(Math.random()*1024**3)
   );
   return position;
 }
@@ -166,8 +167,10 @@ export function makePositions(count: number, amount: number): Positions {
 
 /** Maybe buy a positions, maybe close a position */
 export class TestStrategy implements Strategy {
+  constructor(private readonly probability: number = 0.5){}
+
   public open(context: StrategyContext): PurchaseOrders {
-    if (Math.random()>0.25) return [];
+    if (Math.random()>this.probability) return [];
 
     return any(context.instruments).map((instrument) => ({
       instrument,
@@ -176,7 +179,7 @@ export class TestStrategy implements Strategy {
   }
 
   public close(context: StrategyContext): Positions {
-    if (Math.random()>0.25) return [];
+    if (Math.random()>this.probability) return [];
     return any(context.positions);
   }
 }

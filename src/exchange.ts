@@ -1,4 +1,4 @@
-import type { Amount, Bar, Instrument, Instruments, Price } from "./types.ts";
+import type { Amount, Bar, Instrument, Instruments, PositionID, Price } from "./types.ts";
 import { Position } from "./position.ts";
 import { Account } from "./account.ts";
 
@@ -12,6 +12,9 @@ export class Exchange {
 
   /** Cache of instruments available on each bar */
   private readonly barInstruments: Array<Instruments>;
+
+  /** Uniq ID ofr each position */
+  private id: PositionID = 0;
 
   constructor(
     private readonly instruments: Instruments,
@@ -52,7 +55,7 @@ export class Exchange {
     const fee: Amount = amount * this.fee;
     const purchaseAmount: Amount = amount - fee;
     const units = purchaseAmount / exchangePrice;
-    return new Position(instrument, amount, exchangePrice, units, index);
+    return new Position(instrument, amount, exchangePrice, units, index, this.id++);
   }
 
   /** Sell position for a fee at spread lower than price */

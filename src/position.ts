@@ -1,4 +1,4 @@
-import type { Amount, Bar, Instrument, Price } from "./types.ts";
+import type { Amount, Bar, Instrument, PositionID, Price } from "./types.ts";
 
 export type Positions = Array<Position>;
 
@@ -16,6 +16,7 @@ export class Position {
     public readonly price: Price,
     public readonly units: number,
     public readonly start: Bar,
+    public readonly id: PositionID,
   ) {}
 
   /** Original amount invested */

@@ -1,46 +1,54 @@
 import { Table } from "@sauber/table";
-import type { Position } from "./position.ts";
-import type { Amount, Bar } from "./types.ts";
+import type { Position, Positions } from "./position.ts";
+import type { Amount, Bar, PositionID } from "./types.ts";
 
 /** A collection of instruments */
 export class Portfolio {
+  private readonly inventory: Record<PositionID, Position> = {};
+
   /* Open a portfolio optionally with number of positions */
-  constructor(public readonly positions: Array<Position> = []) {}
+  constructor(positions: Array<Position> = []) {
+    positions.forEach((p) => this.add(p));
+  }
 
   /** Count of positions in portfolio */
   public get length(): number {
-    return this.positions.length;
+    return Object.keys(this.inventory).length;
+  }
+
+  public get positions(): Positions {
+    return Object.values(this.inventory);
   }
 
   /** Add a position to portfolio */
   public add(position: Position): void {
-    this.positions.push(position);
+    const id: PositionID = position.id;
+    this.inventory[id] = position;
   }
 
   /** Remove a position from portfolio */
   public remove(position: Position): void {
-    this.positions.forEach((item, index, array) => {
-      if (item === position) array.splice(index, 1);
-    });
+    const id: PositionID = position.id;
+    delete this.inventory[id];
   }
 
   /** Does position exist */
   public has(position: Position): boolean {
-    return this.positions.some((item) => item === position);
+    const id = position.id;
+    return typeof this.inventory[id] !== "undefined";
   }
 
   /** Total amount invested in positions */
   public get invested(): Amount {
-    return this.positions.reduce(
+    return Object.values(this.inventory).reduce(
       (sum: number, p: Position) => sum + p.invested,
       0,
     );
   }
 
-
   /** Total unrealized value of all positions */
   public value(index: Bar = 0): number {
-    return this.positions.reduce(
+    return Object.values(this.inventory).reduce(
       (sum: number, p: Position) => sum + p.value(index),
       0,
     );
@@ -61,7 +69,7 @@ export class Portfolio {
     let invested = 0;
     let profit = 0;
     let value = 0;
-    t.rows = this.positions.map((p) => {
+    t.rows = Object.values(this.inventory).map((p) => {
       const positionValue = p.value(bar);
 
       // Portfolio stats
@@ -78,7 +86,7 @@ export class Portfolio {
         money(positionValue),
       ];
     });
-    t.title = `Portfolio position=${this.positions.length}, invested=${
+    t.title = `Portfolio position=${this.length}, invested=${
       money(
         invested,
       )

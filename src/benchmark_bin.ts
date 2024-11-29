@@ -8,9 +8,9 @@ import type { Strategy } from "./types.ts";
 const exchange: Exchange = makeExchange(500);
 
 // Create Strategy
-const strategy: Strategy = new TestStrategy();
+const strategy: Strategy = new TestStrategy(1);
 
-// Run Simulation
+// Run Simulation many times
 for (let i = 0; i < 10000; i++) {
   const simulation = new Simulation(exchange, strategy);
   simulation.run();
