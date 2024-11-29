@@ -6,8 +6,12 @@ import { Account } from "./account.ts";
 export class Exchange {
   /** The oldest chart bar index */
   public readonly start: Bar;
+
   /** The most recent chart bar index */
   public readonly end: Bar;
+
+  /** Cache of instruments available on each bar */
+  private readonly barInstruments: Array<Instruments>;
 
   constructor(
     private readonly instruments: Instruments,
@@ -16,6 +20,7 @@ export class Exchange {
   ) {
     this.start = Math.max(...instruments.map((i) => i.start));
     this.end = Math.min(...instruments.map((i) => i.end));
+    this.barInstruments = Array(this.start);
   }
 
   /** Create account on exchange, optional deposit and start bar */
@@ -24,12 +29,16 @@ export class Exchange {
   }
 
   public any(): Instrument {
-    return this.instruments[Math.floor(Math.random()*this.instruments.length)];
+    return this
+      .instruments[Math.floor(Math.random() * this.instruments.length)];
   }
 
   /** Instruments available at bar */
   public on(bar: Bar): Instruments {
-    return this.instruments.filter((i) => i.active(bar));
+    if (!this.barInstruments[bar]) {
+      this.barInstruments[bar] = this.instruments.filter((i) => i.active(bar));
+    }
+    return this.barInstruments[bar];
   }
 
   /** Create a position amount of instrument. Amount is subtracted fee and spread. */
