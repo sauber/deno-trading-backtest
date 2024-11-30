@@ -15,4 +15,5 @@ const stats: Stats = simulation.stats;
 // Print list of transaction, positions and performance stats
 console.log(simulation.account.statement);
 console.log(simulation.account.portfolio.statement(exchange.end));
+console.log(simulation.account.plot(10));
 console.log(`Performance. Profit: ${(stats.profit*100).toFixed(2)}% Trades: ${stats.trades.length} WinRatio: ${stats.WinRatio.toFixed(2)}`)

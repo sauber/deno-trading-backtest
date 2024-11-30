@@ -2,10 +2,11 @@ import { Table } from "@sauber/table";
 import { Portfolio } from "./portfolio.ts";
 import type { Position } from "./position.ts";
 import type { Amount, Bar, Price } from "./types.ts";
-import type { Instrument } from "./instrument.ts";
+import { Instrument } from "./instrument.ts";
 import { Chart } from "./chart.ts";
 import type { Exchange } from "./exchange.ts";
 import { Trade } from "./trade.ts";
+import { plot } from "asciichart";
 
 type Transaction = {
   bar: Bar;
@@ -216,5 +217,17 @@ export class Account {
       money(t.invested + t.cash),
     ]);
     return table.toString();
+  }
+
+  /** Printable graph of valuation */
+  public plot(height: number = 16): string {
+    // Convert account to instrument
+    const instrument = new Instrument(
+      this.valuation.values,
+      this.valuation.end,
+      "Simulation",
+      [this.valuation.start, this.valuation.end].join("-"),
+    );
+    return instrument.plot(height);
   }
 }
