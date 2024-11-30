@@ -47,6 +47,9 @@ export type StrategyContext = {
   /** Bar index in chart */
   bar: Bar;
 
+  /** Total value of account */
+  value: Amount;
+
   /** Target amount for new positions */
   amount: Amount;
 

@@ -38,6 +38,7 @@ export class Simulation {
 
     const today: StrategyContext = {
       amount,
+      value: this.account.value(bar),
       bar,
       instruments: this.exchange.on(bar),
       positions: this.account.positions,
@@ -54,6 +55,7 @@ export class Simulation {
   private sell(bar: Bar): void {
     const today: StrategyContext = {
       amount: this.account.balance,
+      value: this.account.value(bar),
       bar,
       instruments: this.exchange.on(bar),
       positions: this.account.positions,
