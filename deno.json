@@ -12,7 +12,6 @@
     "@sauber/statistics": "jsr:@sauber/statistics@^0.4.0",
     "@sauber/table": "jsr:@sauber/table@^0.1.0",
     "@std/assert": "jsr:@std/assert@^1.0.8",
-    "asciichart": "npm:asciichart@^1.5.25",
-    "nanoid": "npm:nanoid@^5.0.9"
+    "asciichart": "npm:asciichart@^1.5.25"
   }
 }

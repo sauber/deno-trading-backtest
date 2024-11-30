@@ -6,7 +6,8 @@ import {
   assertInstanceOf,
 } from "@std/assert";
 import { Account } from "./account.ts";
-import type { Amount, Bar, Instrument } from "./types.ts";
+import type { Instrument } from "./instrument.ts";
+import type { Amount, Bar } from "./types.ts";
 import type { Position } from "./position.ts";
 
 const instruments = makeInstruments(3);

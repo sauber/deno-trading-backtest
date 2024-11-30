@@ -1,6 +1,11 @@
-import type { Amount, Bar, Instrument, PositionID, Price } from "./types.ts";
+import type { Amount, Bar, Price } from "./types.ts";
+import type { Instrument } from "./instrument.ts";
 
+/** List of positions */
 export type Positions = Array<Position>;
+
+/** ID of position */
+export type PositionID = number;
 
 export class Position {
   /**

@@ -2,9 +2,9 @@ import type { Account } from "./account.ts";
 import type { Exchange } from "./exchange.ts";
 import type { Positions } from "./position.ts";
 import { Stats } from "./stats.ts";
+import type { Instruments } from "./instrument.ts";
 import type {
   Bar,
-  Instruments,
   PurchaseOrders,
   Strategy,
   StrategyContext,

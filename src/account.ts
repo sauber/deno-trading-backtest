@@ -1,7 +1,8 @@
 import { Table } from "@sauber/table";
 import { Portfolio } from "./portfolio.ts";
 import type { Position } from "./position.ts";
-import type { Amount, Bar, Instrument, Price } from "./types.ts";
+import type { Amount, Bar, Price } from "./types.ts";
+import type { Instrument } from "./instrument.ts";
 import { Chart } from "./chart.ts";
 import type { Exchange } from "./exchange.ts";
 import { Trade } from "./trade.ts";

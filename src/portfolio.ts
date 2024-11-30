@@ -1,6 +1,6 @@
 import { Table } from "@sauber/table";
-import type { Position, Positions } from "./position.ts";
-import type { Amount, Bar, PositionID } from "./types.ts";
+import type { Position, Positions, PositionID } from "./position.ts";
+import type { Amount, Bar } from "./types.ts";
 
 /** A collection of instruments */
 export class Portfolio {

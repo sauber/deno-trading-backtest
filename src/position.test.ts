@@ -1,7 +1,8 @@
 import { assertEquals, assertInstanceOf, assertNotEquals } from "@std/assert";
 import { makeInstrument } from "./testdata.ts";
-import { Position } from "./position.ts";
-import type { Amount, Bar, Instrument, PositionID, Price } from "./types.ts";
+import { Position, type PositionID } from "./position.ts";
+import type { Amount, Bar, Price } from "./types.ts";
+import type { Instrument } from "./instrument.ts";
 
 const instr: Instrument = makeInstrument();
 
@@ -25,7 +26,14 @@ Deno.test("Value", () => {
   const units = 10;
   const price: Price = 100;
   const id: PositionID = 0;
-  const pos: Position = new Position(instr, amount, price, units, instr.start, id);
+  const pos: Position = new Position(
+    instr,
+    amount,
+    price,
+    units,
+    instr.start,
+    id,
+  );
 
   const purchaseValue: Amount = amount;
   const currentValue: Amount = pos.value(instr.end);

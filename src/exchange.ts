@@ -1,5 +1,6 @@
-import type { Amount, Bar, Instrument, Instruments, PositionID, Price } from "./types.ts";
-import { Position } from "./position.ts";
+import type { Amount, Bar, Price } from "./types.ts";
+import type { Instrument, Instruments } from "./instrument.ts";
+import { Position, type PositionID } from "./position.ts";
 import { Account } from "./account.ts";
 
 /** An exchange where accounts can aquire or release positions in instruments for a fee */
@@ -55,7 +56,14 @@ export class Exchange {
     const fee: Amount = amount * this.fee;
     const purchaseAmount: Amount = amount - fee;
     const units = purchaseAmount / exchangePrice;
-    return new Position(instrument, amount, exchangePrice, units, index, this.id++);
+    return new Position(
+      instrument,
+      amount,
+      exchangePrice,
+      units,
+      index,
+      this.id++,
+    );
   }
 
   /** Sell position for a fee at spread lower than price */

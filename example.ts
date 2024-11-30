@@ -1,11 +1,11 @@
 import { Simulation, type Strategy, type Exchange, type Stats } from "./mod.ts";
-import { makeExchange, TestStrategy } from "./src/testdata.ts";
+import { makeExchange, MaybeStrategy } from "./src/testdata.ts";
 
 // Create an Exchange with a numebr instruments available
 const exchange: Exchange = makeExchange(3);
 
 // Create Strategy
-const strategy: Strategy = new TestStrategy();
+const strategy: Strategy = new MaybeStrategy();
 
 // Run Simulation
 const simulation = new Simulation(exchange, strategy);

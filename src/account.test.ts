@@ -2,7 +2,8 @@ import { assertEquals, assertInstanceOf } from "@std/assert";
 import { Account } from "./account.ts";
 import { makeInstruments } from "./testdata.ts";
 import { Exchange } from "./exchange.ts";
-import type { Amount, Bar, Instrument } from "./types.ts";
+import type { Amount, Bar } from "./types.ts";
+import type { Instrument } from "./instrument.ts";
 import { Position } from "./position.ts";
 
 const ex: Exchange = new Exchange(makeInstruments(3));

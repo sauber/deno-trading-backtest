@@ -1,8 +1,15 @@
-import { assertEquals, assertGreater, assertInstanceOf, assertLess, assertNotEquals } from "@std/assert";
+import {
+  assertEquals,
+  assertGreater,
+  assertInstanceOf,
+  assertLess,
+  assertNotEquals,
+} from "@std/assert";
 import { Stats } from "./stats.ts";
 import type { Account } from "./account.ts";
 import { makeExchange } from "./testdata.ts";
-import type { Amount, Bar, Instrument } from "./types.ts";
+import type { Amount, Bar } from "./types.ts";
+import type { Instrument } from "./instrument.ts";
 import type { Position } from "./position.ts";
 
 const ex = makeExchange(3);
@@ -99,4 +106,3 @@ Deno.test("InvestedRatio", () => {
   assertGreater(ir, 0);
   assertLess(ir, 1);
 });
-

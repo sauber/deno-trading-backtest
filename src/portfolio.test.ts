@@ -7,7 +7,8 @@ import {
 import { Portfolio } from "./portfolio.ts";
 import { Position } from "./position.ts";
 import { makeInstrument, makePosition } from "./testdata.ts";
-import type { Amount, Bar, Instrument, Price } from "./types.ts";
+import type { Amount, Bar, Price } from "./types.ts";
+import type { Instrument } from "./instrument.ts";
 
 Deno.test("Instance", () => {
   const p = new Portfolio();

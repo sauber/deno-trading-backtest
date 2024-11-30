@@ -1,66 +1,63 @@
 /** Generate data for testing */
+
+import { nanoid } from "npm:nanoid@^5.0.9";
+import { randn } from "@sauber/statistics";
 import type {
   Bar,
-  Instrument,
-  Instruments,
   Price,
   PurchaseOrders,
   Strategy,
   StrategyContext,
 } from "./types.ts";
-import { nanoid } from "nanoid";
-import { plot } from "asciichart";
-import { downsample, randn } from "@sauber/statistics";
-import { Position, type Positions } from "./position.ts";
-import { Chart } from "./chart.ts";
+import { Position, type PositionID, type Positions } from "./position.ts";
 import { Exchange } from "./exchange.ts";
+import { Instrument, type Instruments } from "./instrument.ts";
 
-/** Generate a random chart */
-function randomChart(count: number, end: Bar): Chart {
-  const chart: number[] = [];
+type Prices = Array<Price>;
+
+/** Generate a random price chart */
+function makeChart(count: number): Prices {
+  const series: Prices = Array(count);
   let price = 1000 * Math.random();
   for (let i = 0; i < count; i++) {
     const change = (randn() - 0.5) / 5; // +/- 2.5%
     price *= 1 + change;
-    chart.push(parseFloat(price.toFixed(4)));
+    series[i] = parseFloat(price.toFixed(4));
   }
-  return new Chart(chart, end);
+  return series;
 }
 
 /** Make up a business name from an acronym */
 function makeName(symbol: string): string {
-  const text = `Head Heart Hands 
-American Consultants League Civil Liberties Union Association for 
-Commuter Transportation Amyotrophic Lateral Sclerosis Writers and 
-Artists Institute Better Business Bureau Council of Actions United 
-Service Efforts Conference of Minority Public Administrators Direct 
-Marketing Educational Foundation United States Environmental Protection 
-Agency Federal Emergency Management Home School Legal Defense Housing 
-and Urban Development International Atomic Energy Crime Police 
-Organization Olympic Committee Internal Revenue Service Standardization
-National of Broadcast Employees Technicians National Aeronautics Space 
-Administration North Atlantic Treaty National Rifle of the Petroleum 
-Exporting Countries Occupational Safety Health Transport Elderly 
-Disabled Persons United Nations Childrens Fund World Health World 
-Wildlife Young Mens Christian The Minnesota Mining Manufacturing 
-Company Allen Wright Telephone Telegraph Bavarian Motor Works Bradley 
-Voorhees Day Consumer Value Stores Government Insurance Sports 
-Programming Network Experimental Prototype Community of Tomorrow Henry 
-Richard Block Mauritz Hongkong Shanghai Banking Corporation
-Machines James Bullough Lansing Leon Leonwood Bean Mars Murries Makeup 
-Art Cosmetics National Broadcasting Cooking Spray Product of Arthur 
-Meyer Non-Expandable Recreational Foam Recreational Equipment Shoulder 
-of Pork Ham Thomas Swift Electric Rifle The Countrys Best Yogurt Thank 
-God Its Fridays United Parcel Service Water Displacement formula World 
-Wrestling Entertainment Yet Another Hierarchical Officious Oracle 
-Yoshida Manufacturing Kit Kat Kind King Karen Kidz Key Kwik Quick Quay 
-Queen Quest Xero Xtra Zebra Zimmer Zero Zip Zig Zag Zac Java Jelly Just 
-Jet Jura Juicy
+  const text = `
+Actions Administration Administrators Aeronautics Agency Allen American
+Amyotrophic Another Art Arthur Artists Association Atlantic Atomic
+Banking Bavarian Bean Best Better Block Bradley Broadcast Broadcasting
+Bullough Bureau Business Childrens Christian Civil Committee Community
+Commuter Company Conference Consultants Consumer Cooking Corporation
+Cosmetics Council Countries Countrys Crime Day Defense Development
+Direct Disabled Displacement Educational Efforts Elderly Electric
+Emergency Employees Energy Entertainment Environmental Equipment
+Expandable Experimental Exporting Federal Foam Foundation Fridays Fund
+God Government Ham Hands Head Health Health Heart Henry Hierarchical
+Home Hongkong Housing Institute Insurance Internal International Its
+James Java Jelly Jet Juicy Jura Just Karen Kat Key Kidz Kind King Kit
+Kwik Lansing Lateral League Legal Leon Leonwood Liberties Machines
+Makeup Management Manufacturing Marketing Mars Mauritz Mens Meyer
+Mining Minnesota Minority Motor Murries National Nations Network North
+Occupational Officious Olympic Oracle Organization Parcel Persons
+Petroleum Police Pork Product Programming Protection Prototype Public
+Quay Queen Quest Quick Recreational Revenue Richard Rifle Safety School
+Sclerosis Service Shanghai Shoulder Space Sports Spray Standardization
+States Stores Swift Technicians Telegraph Telephone Thank Thomas
+Tomorrow Transport Transportation Treaty Union United Urban Value Water
+Wildlife Works World Wrestling Wright Writers Xero Xtra Yet Yogurt
+Yoshida Young Zac Zag Zebra Zero Zig Zimmer Zip
   `;
 
   const d: Record<string, Set<string>> = {};
-  const sorted = text.match(/\b(\w+)\b/g)?.sort() as string[];
-  for (const word of sorted) {
+  const words = text.match(/\b(\w+)\b/g)?.sort() as string[];
+  for (const word of words) {
     const letter: string = word.charAt(0).toUpperCase();
     if (!(letter in d)) d[letter] = new Set();
     d[letter].add(word);
@@ -82,43 +79,6 @@ Jet Jura Juicy
   return name;
 }
 
-/** An instrument with a random symbol and random price */
-export class TestInstrument implements Instrument {
-  public readonly symbol: string = nanoid(4).toUpperCase();
-  public readonly name: string = makeName(this.symbol);
-  private readonly chart: Chart;
-  public readonly start: Bar;
-
-  constructor(
-    private readonly length: number = 700,
-    public readonly end: Bar = 0,
-  ) {
-    this.chart = randomChart(this.length, end);
-    this.start = this.chart.start;
-  }
-
-  /** Random price with 10% of base price */
-  public price(bar: Bar): Price {
-    return this.chart.bar(bar);
-  }
-
-  /** Active if within  */
-  public active(bar: Bar): boolean {
-    return this.chart.has(bar);
-  }
-
-  /** Printable Ascii Chart */
-  public plot(height: number = 15, width: number = 78): string {
-    height -= 2;
-    const price = this.chart.series.slice().reverse();
-    const chart = downsample(price, width - 7);
-    const padding = "       ";
-    return (
-      `[ ${this.symbol} - ${this.name}]\n` + plot(chart, { height, padding })
-    );
-  }
-}
-
 // Create array from callback
 function repeat<T>(callback: () => T, count: number): Array<T> {
   return Array.from(Array(count).keys().map(callback));
@@ -132,12 +92,14 @@ function any<T>(items: Array<T>): Array<T> {
   return [items[index]];
 }
 
-
 /** Generate an instrument */
 export function makeInstrument(): Instrument {
-  const length: number = Math.floor(Math.random() * 700);
+  const length: number = Math.floor(Math.random() * 1400);
   const end: Bar = Math.floor(Math.random() * 150);
-  return new TestInstrument(length, end);
+  const series: Prices = makeChart(length);
+  const symbol: string = nanoid(4);
+  const name: string = makeName(symbol);
+  return new Instrument(series, end, symbol, name);
 }
 
 /** A list of random instruments */
@@ -149,14 +111,9 @@ export function makeInstruments(count: number): Instruments {
 export function makePosition(amount: number): Position {
   const instr: Instrument = makeInstrument();
   const price = instr.price(instr.start);
-  const position = new Position(
-    instr,
-    amount,
-    price,
-    amount / price,
-    instr.start,
-    Math.floor(Math.random()*1024**3)
-  );
+  const units = amount / price;
+  const id: PositionID = Math.floor(Math.random() * 1024 ** 3);
+  const position = new Position(instr, amount, price, units, instr.start, id);
   return position;
 }
 
@@ -166,11 +123,11 @@ export function makePositions(count: number, amount: number): Positions {
 }
 
 /** Maybe buy a positions, maybe close a position */
-export class TestStrategy implements Strategy {
-  constructor(private readonly probability: number = 0.5){}
+export class MaybeStrategy implements Strategy {
+  constructor(private readonly probability: number = 0.5) {}
 
   public open(context: StrategyContext): PurchaseOrders {
-    if (Math.random()>this.probability) return [];
+    if (Math.random() > this.probability) return [];
 
     return any(context.instruments).map((instrument) => ({
       instrument,
@@ -179,12 +136,12 @@ export class TestStrategy implements Strategy {
   }
 
   public close(context: StrategyContext): Positions {
-    if (Math.random()>this.probability) return [];
+    if (Math.random() > this.probability) return [];
     return any(context.positions);
   }
 }
 
-/** Create an exchange with a number if instruments availabel */
+/** Create an exchange with a number of instruments availabel */
 export function makeExchange(count: number): Exchange {
   return new Exchange(makeInstruments(count));
 }
