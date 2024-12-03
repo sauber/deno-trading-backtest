@@ -2,6 +2,8 @@ import { plot } from "asciichart";
 import { downsample } from "@sauber/statistics";
 import type { Bar, Price } from "./types.ts";
 
+export type Series = Array<Price>;
+
 /** Symbol and price series
  * Values are sorted from oldest to newest.
  * Bar index indicates the age.
@@ -28,7 +30,7 @@ export class Instrument {
    * @param name - Full name of instrument
    */
   constructor(
-    public readonly series: Array<Price>,
+    public readonly series: Series,
     public readonly end: Bar,
     public readonly symbol: string,
     public readonly name?: string,
