@@ -1,5 +1,5 @@
 import type { Amount, Bar, Price, Symbol } from "./types.ts";
-import { Instrument, Instruments } from "./instrument.ts";
+import type { Instrument, Instruments } from "./instrument.ts";
 import { Position, type PositionID } from "./position.ts";
 import { Account } from "./account.ts";
 

@@ -7,7 +7,7 @@ import {
   assertInstanceOf,
 } from "@std/assert";
 import { Account } from "./account.ts";
-import { Instrument } from "./instrument.ts";
+import type { Instrument } from "./instrument.ts";
 import type { Amount, Bar } from "./types.ts";
 import type { Position } from "./position.ts";
 
