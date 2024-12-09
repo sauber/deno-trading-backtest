@@ -1,5 +1,5 @@
-import type { Amount, Bar, Price } from "./types.ts";
-import type { Instrument, Instruments } from "./instrument.ts";
+import type { Amount, Bar, Price, Symbol } from "./types.ts";
+import { Instrument, Instruments } from "./instrument.ts";
 import { Position, type PositionID } from "./position.ts";
 import { Account } from "./account.ts";
 
@@ -72,5 +72,10 @@ export class Exchange {
     const amount: Amount = value * (1 - this.spread);
     const fee: Amount = amount * this.fee;
     return amount - fee;
+  }
+
+  /** Get instrument by symbol */
+  public get(symbol: Symbol): Instrument | undefined {
+    return this.instruments.find((i) => i.symbol === symbol);
   }
 }
