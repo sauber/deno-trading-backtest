@@ -4,4 +4,5 @@ export * from "./src/exchange.ts";
 export * from "./src/stats.ts";
 export * from "./src/position.ts";
 export * from "./src/instrument.ts";
+export * from "./src/portfolio.ts";
 export * from "./src/testinstrument.ts";
