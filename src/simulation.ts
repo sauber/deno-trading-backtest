@@ -2,7 +2,7 @@ import type { Account } from "./account.ts";
 import type { Exchange } from "./exchange.ts";
 import type { Positions } from "./position.ts";
 import { Stats } from "./stats.ts";
-import type { Instruments } from "./instrument.ts";
+import type { Instrument, Instruments } from "./instrument.ts";
 import type {
   Bar,
   PurchaseOrders,
@@ -40,7 +40,10 @@ export class Simulation {
       amount,
       value: this.account.value(bar),
       bar,
-      instruments: this.exchange.on(bar),
+      purchaseorders: this.exchange.on(bar).map((instrument: Instrument) => ({
+        instrument,
+        amount: 1,
+      })),
       positions: this.account.positions,
     };
 
@@ -57,7 +60,10 @@ export class Simulation {
       amount: this.account.balance,
       value: this.account.value(bar),
       bar,
-      instruments: this.exchange.on(bar),
+      purchaseorders: this.exchange.on(bar).map((instrument: Instrument) => ({
+        instrument,
+        amount: 1,
+      })),
       positions: this.account.positions,
     };
 

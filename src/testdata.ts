@@ -48,19 +48,14 @@ export function makePositions(count: number, amount: number): Positions {
 export class MaybeStrategy implements Strategy {
   constructor(private readonly probability: number = 0.5) {}
 
-  public open(context: StrategyContext): PurchaseOrders {
-    if (Math.random() > this.probability) return [];
-
-    return any(context.instruments).map((instrument) => ({
-      instrument,
-      amount: context.amount / 10,
-    }));
-  }
-
   public close(context: StrategyContext): Positions {
-    if (Math.random() > this.probability) return [];
-    return any(context.positions);
+    return Math.random() < this.probability ? any(context.positions) : [];
   }
+
+  public open(context: StrategyContext): PurchaseOrders {
+    return Math.random() < this.probability ? any(context.purchaseorders) : [];
+  }
+
 }
 
 /** Create an exchange with a number of instruments availabel */

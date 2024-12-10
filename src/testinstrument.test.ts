@@ -19,8 +19,7 @@ Deno.test("Properties", () => {
   assertNotEquals(i.first, i.last);
 });
 
-Deno.test("Print", {ignore: true}, () => {
+Deno.test("Print", { ignore: true }, () => {
   const i = new TestInstrument();
   console.log(i.plot());
 });
-

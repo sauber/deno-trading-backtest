@@ -1,5 +1,5 @@
 import type { Positions } from "./position.ts";
-import type { Instrument, Instruments } from "./instrument.ts";
+import type { Instrument } from "./instrument.ts";
 
 /** Bar index in chart */
 export type Bar = number;
@@ -31,7 +31,7 @@ export type StrategyContext = {
   amount: Amount;
 
   /** Instruments available at index */
-  instruments: Instruments;
+  purchaseorders: PurchaseOrders;
 
   /** Current open positions */
   positions: Positions;
@@ -39,9 +39,10 @@ export type StrategyContext = {
 
 /** Strategy to suggest positions to open and close */
 export type Strategy = {
+  // Generate list of positions to close
+  close: (context: StrategyContext) => Positions;
+
   // Generate list of positions to open
   open: (context: StrategyContext) => PurchaseOrders;
 
-  // Generate list of positions to close
-  close: (context: StrategyContext) => Positions;
 };
