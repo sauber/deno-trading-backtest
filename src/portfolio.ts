@@ -55,7 +55,7 @@ export class Portfolio {
   }
 
   /** Printable statement */
-  public statement(bar: Bar): string {
+  public toString(bar: Bar): string {
     const money = (v: number): number => parseFloat(v.toFixed(2));
     const t = new Table();
     t.headers = [

@@ -1,6 +1,9 @@
 import type { Positions } from "./position.ts";
 import type { Instrument } from "./instrument.ts";
 
+/** Symbol is a string */
+export type Symbol = string;
+
 /** Bar index in chart */
 export type Bar = number;
 

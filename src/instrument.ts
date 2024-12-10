@@ -1,6 +1,6 @@
 import { plot } from "asciichart";
 import { downsample } from "@sauber/statistics";
-import type { Bar, Price } from "./types.ts";
+import type { Bar, Price, Symbol } from "./types.ts";
 
 export type Series = Array<Price>;
 
@@ -32,7 +32,7 @@ export class Instrument {
   constructor(
     public readonly series: Series,
     public readonly end: Bar,
-    public readonly symbol: string,
+    public readonly symbol: Symbol,
     public readonly name?: string,
   ) {
     this.start = this.end + this.series.length - 1;

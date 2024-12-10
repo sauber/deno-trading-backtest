@@ -2,6 +2,7 @@ import { Exchange } from "./exchange.ts";
 import { makeInstruments } from "./testdata.ts";
 import {
   assertAlmostEquals,
+  assertEquals,
   assertGreater,
   assertInstanceOf,
 } from "@std/assert";
@@ -42,4 +43,12 @@ Deno.test("Buy and selling", () => {
   // Selling at same bar as buying should return same amount as invested,
   // when trading is free of fees.
   assertAlmostEquals(returns, amount);
+});
+
+Deno.test("Get instrument", () => {
+  const ex = new Exchange(instruments);
+  const any: Instrument = ex.any();
+  const symbol = any.symbol;
+  const instrument = ex.get(symbol);
+  assertEquals(instrument, any);
 });

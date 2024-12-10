@@ -6,7 +6,6 @@ import { Instrument } from "./instrument.ts";
 import { Chart } from "./chart.ts";
 import type { Exchange } from "./exchange.ts";
 import { Trade } from "./trade.ts";
-import { plot } from "asciichart";
 
 type Transaction = {
   bar: Bar;
@@ -192,7 +191,7 @@ export class Account {
   }
 
   /** A printable statement */
-  public get statement(): string {
+  public get toString(): string {
     const money = (v: number): number => parseFloat(v.toFixed(2));
     const table = new Table();
     table.title = "Transactions";
