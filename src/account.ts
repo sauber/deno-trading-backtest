@@ -218,7 +218,9 @@ export class Account {
     return table.toString();
   }
 
-  /** Printable graph of valuation */
+  /** Printable graph of valuation 
+   * TODO: Add cash line to chart
+  */
   public plot(height: number = 16): string {
     // Convert account to instrument
     const instrument = new Instrument(
