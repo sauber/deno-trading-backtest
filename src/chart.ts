@@ -1,7 +1,7 @@
 import type { Bar, Price } from "./types.ts";
 
 export type Series = Array<Price>;
-export type Buffer = Float16Array;
+export type Buffer = Float32Array;
 
 /**
  * Series of Values
@@ -25,7 +25,7 @@ export class Chart {
   ) {
     this.start = this.end + series.length - 1;
     // this.first = series[0];
-    this.buffer = new Float16Array(series);
+    this.buffer = new Float32Array(series);
   }
 
   /** Most recent value in series */

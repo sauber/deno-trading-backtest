@@ -87,6 +87,6 @@ export class TestInstrument extends Instrument {
     const name: string = makeName(symbol);
     const series: Series = makeSeries(length);
     const end: Bar = Math.floor(Math.random() * length / 5);
-    super(new Float16Array(series), end, symbol, name);
+    super(new Float32Array(series), end, symbol, name);
   }
 }

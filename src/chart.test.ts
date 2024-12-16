@@ -20,7 +20,7 @@ Deno.test("Bar", () => {
 
 Deno.test("Values", () => {
   const c = new Chart([0, 1]);
-  assertEquals(c.values, new Float16Array([0, 1]));
+  assertEquals(c.values, new Float32Array([0, 1]));
 });
 
 Deno.test("Offset", () => {

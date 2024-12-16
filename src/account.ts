@@ -231,7 +231,7 @@ export class Account {
   public plot(height: number = 16): string {
     // Convert account to instrument
     const instrument = new Instrument(
-      new Float16Array(this.valuation),
+      new Float32Array(this.valuation),
       this.end,
       "Simulation",
       [this.start, this.end].join("-"),
