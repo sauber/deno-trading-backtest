@@ -1,8 +1,7 @@
 import { plot } from "asciichart";
 import { downsample } from "@sauber/statistics";
 import type { Bar, Price, Symbol } from "./types.ts";
-
-export type Series = Array<Price>;
+import type { Buffer } from "./chart.ts";
 
 /** Symbol and price series
  * Values are sorted from oldest to newest.
@@ -30,15 +29,15 @@ export class Instrument {
    * @param name - Full name of instrument
    */
   constructor(
-    public readonly series: Series,
+    public readonly buffer: Buffer,
     public readonly end: Bar,
     public readonly symbol: Symbol,
     public readonly name?: string,
   ) {
-    this.start = this.end + this.series.length - 1;
-    this.first = this.series[0];
-    this.last = this.series[this.series.length - 1];
-    this.length = this.series.length;
+    this.start = this.end + this.buffer.length - 1;
+    this.first = this.buffer[0];
+    this.last = this.buffer[this.buffer.length - 1];
+    this.length = this.buffer.length;
   }
 
   /** Active if bar within series range */
@@ -54,19 +53,19 @@ export class Instrument {
       );
     }
 
-    const index = this.series.length - bar + this.end - 1;
-    return this.series[index];
+    const index = this.buffer.length - bar + this.end - 1;
+    return this.buffer[index];
   }
 
   /** Printable Ascii Chart */
   public plot(height: number = 15, width: number = 78): string {
     height -= 2;
     const max = Math.max(
-      ...[this.series[0], this.series[this.series.length - 1]].map((v) =>
+      ...[this.buffer[0], this.buffer[this.buffer.length - 1]].map((v) =>
         v.toFixed(2).length
       ),
     );
-    const values = downsample(this.series, width - max);
+    const values = downsample(Array.from(this.buffer), width - max);
     const padding = " ".repeat(max);
     return (
       `[ ${this.symbol} - ${this.name}]\n` + plot(values, { height, padding })

@@ -3,7 +3,7 @@ import { Portfolio } from "./portfolio.ts";
 import type { Position } from "./position.ts";
 import type { Amount, Bar, Price } from "./types.ts";
 import { Instrument } from "./instrument.ts";
-import { Chart } from "./chart.ts";
+import { Chart, Series } from "./chart.ts";
 import type { Exchange } from "./exchange.ts";
 import { Trade } from "./trade.ts";
 
@@ -53,10 +53,16 @@ export class Account {
   public readonly trades: Trades = [];
 
   /** Total valuation daily chart */
-  public readonly valuation: Chart;
+  public readonly valuation: Series;
 
   /** Daily value of investment */
-  public readonly equity: Chart;
+  public readonly equity: Series;
+
+  /** First bar */
+  public start: Bar;
+
+  /** Current last bar */
+  public end: Bar;
 
   /** Optionally deposit an amount at account opening */
   constructor(
@@ -64,9 +70,13 @@ export class Account {
     deposit: number = 0,
     bar: Bar = 0,
   ) {
-    this.valuation = new Chart([deposit], bar);
-    this.equity = new Chart([0], bar);
+    // this.valuation = new Chart([deposit], bar);
+    // this.equity = new Chart([0], bar);
+    this.valuation = [deposit];
+    this.equity = [0];
     if (deposit != 0) this.deposit(deposit, bar);
+    this.start = bar;
+    this.end = bar;
   }
 
   /** Amount of available funds */
@@ -76,20 +86,19 @@ export class Account {
 
   /** Valuation at each bar */
   private valuate(bar: Bar): void {
-    const end = this.valuation.end;
-    if (bar > end) {
+    if (bar > this.end) {
       throw new Error(
-        `Valuation at new bar ${bar} is prior to latest bar ${end}`,
+        `Valuation at new bar ${bar} is prior to latest bar ${this.end}`,
       );
     }
-    if (bar == end) return;
+    if (bar == this.end) return;
 
     // Catch up until bar
     const cash = this.balance;
-    for (let index = end - 1; index >= bar; index--) {
+    for (let index = this.end - 1; index >= bar; index--) {
       const equity: number = this.portfolio.value(index);
-      this.equity.add(equity);
-      this.valuation.add(cash + equity);
+      this.equity.push(equity);
+      this.valuation.push(cash + equity);
     }
   }
 
@@ -222,10 +231,10 @@ export class Account {
   public plot(height: number = 16): string {
     // Convert account to instrument
     const instrument = new Instrument(
-      this.valuation.values,
-      this.valuation.end,
+      new Float16Array(this.valuation),
+      this.end,
       "Simulation",
-      [this.valuation.start, this.valuation.end].join("-"),
+      [this.start, this.end].join("-"),
     );
     return instrument.plot(height);
   }

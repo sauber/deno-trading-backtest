@@ -1,8 +1,9 @@
 /** Generate data for testing */
 import { nanoid } from "nanoid";
-import { Instrument, type Series } from "./instrument.ts";
+import { Instrument } from "./instrument.ts";
 import { randn } from "@sauber/statistics";
 import type { Bar, Price } from "./types.ts";
+import type { Series } from "./chart.ts";
 
 /** Generate a random chart */
 function makeSeries(count: number): Series {
@@ -86,6 +87,6 @@ export class TestInstrument extends Instrument {
     const name: string = makeName(symbol);
     const series: Series = makeSeries(length);
     const end: Bar = Math.floor(Math.random() * length / 5);
-    super(series, end, symbol, name);
+    super(new Float16Array(series), end, symbol, name);
   }
 }

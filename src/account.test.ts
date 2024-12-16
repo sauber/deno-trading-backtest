@@ -78,7 +78,7 @@ Deno.test("Automatic valuation", () => {
   const account = new Account(ex, deposit, start);
   const end: Bar = 0;
   account.withdraw(deposit, end);
-  assertEquals(account.valuation.series, [deposit, deposit, deposit]);
+  assertEquals(account.valuation, [deposit, deposit, deposit]);
 });
 
 Deno.test("List of no trades", () => {

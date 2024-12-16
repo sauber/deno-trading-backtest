@@ -1,6 +1,7 @@
 import type { Bar, Price } from "./types.ts";
 
-type Series = Array<Price>;
+export type Series = Array<Price>;
+export type Buffer = Float16Array;
 
 /**
  * Series of Values
@@ -13,27 +14,33 @@ export class Chart {
   /** Bar Index of last item in array, more old entry */
   public readonly start: Bar;
 
-  /** Oldest value in chart */
-  public readonly first: Price;
+  /** Memory compacted series */
+  private readonly buffer: Buffer;
 
   constructor(
     /** Series of chart values array */
-    public readonly series: Series = [],
+    series: Series = [],
     /** Bar index of most recent value */
-    public end: Bar = 0,
+    public readonly end: Bar = 0,
   ) {
-    this.start = this.end + this.series.length - 1;
-    this.first = this.series[0];
+    this.start = this.end + series.length - 1;
+    // this.first = series[0];
+    this.buffer = new Float16Array(series);
+  }
+
+  /** Most recent value in series */
+  public get first(): Price {
+    return this.buffer[0];
   }
 
   /** Most recent value in series */
   public get last(): Price {
-    return this.series[this.series.length - 1];
+    return this.buffer[this.buffer.length - 1];
   }
 
   /** Count of bars in chart */
   public get length(): number {
-    return this.series.length;
+    return this.buffer.length;
   }
 
   /** Confirm if data is available at bar index */
@@ -49,19 +56,19 @@ export class Chart {
       );
     }
 
-    const index = this.series.length - bar + this.end - 1;
-    return this.series[index];
+    const index = this.buffer.length - bar + this.end - 1;
+    return this.buffer[index];
   }
 
   /** Extend series with value */
-  public add(price: Price): void {
-    this.series.push(price);
-    --this.end;
-  }
+  // public add(price: Price): void {
+  //   this.series.push(price);
+  //   --this.end;
+  // }
 
   /** Array of all values */
-  public get values(): Series {
-    return this.series;
+  public get values(): Buffer {
+    return this.buffer;
   }
 }
 
