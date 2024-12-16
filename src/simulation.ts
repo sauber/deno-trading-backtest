@@ -1,10 +1,11 @@
 import type { Account } from "./account.ts";
 import type { Exchange } from "./exchange.ts";
-import type { Positions } from "./position.ts";
+import type { Position, Positions } from "./position.ts";
 import { Stats } from "./stats.ts";
 import type { Instrument, Instruments } from "./instrument.ts";
 import type {
   Bar,
+  CloseOrders,
   PurchaseOrders,
   Strategy,
   StrategyContext,
@@ -30,6 +31,14 @@ export class Simulation {
     for (const position of expired) this.account.remove(position, bar + 1);
   }
 
+  /** Generate a list of close orders for all open positions */
+  private makeCloseOrders(): CloseOrders {
+    return this.account.positions.map((position: Position) => ({
+      position,
+      confidence: 1,
+    }));
+  }
+
   /** Generate a list of purchase orders for all instruments available at Bar */
   private makePurchaseOrders(bar: Bar): PurchaseOrders {
     return this.exchange.on(bar).map((instrument: Instrument) => ({
@@ -45,7 +54,7 @@ export class Simulation {
       value: this.account.value(bar),
       bar,
       purchaseorders: this.makePurchaseOrders(bar),
-      positions: this.account.positions,
+      closeorders: this.makeCloseOrders(),
     };
   }
 
@@ -59,9 +68,9 @@ export class Simulation {
 
   /** Sell all positions advised by strategy */
   private sell(bar: Bar): void {
-    const positions: Positions = this.strategy.close(this.makeContext(bar));
-    for (const position of positions) {
-      this.account.remove(position, bar);
+    const orders: CloseOrders = this.strategy.close(this.makeContext(bar));
+    for (const order of orders) {
+      this.account.remove(order.position, bar);
     }
   }
 

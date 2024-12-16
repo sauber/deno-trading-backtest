@@ -1,6 +1,11 @@
 /** Generate data for testing */
 
-import type { PurchaseOrders, Strategy, StrategyContext } from "./types.ts";
+import type {
+  CloseOrders,
+  PurchaseOrders,
+  Strategy,
+  StrategyContext,
+} from "./types.ts";
 import { Position, type PositionID, type Positions } from "./position.ts";
 import { Exchange } from "./exchange.ts";
 import type { Instrument, Instruments } from "./instrument.ts";
@@ -48,14 +53,13 @@ export function makePositions(count: number, amount: number): Positions {
 export class MaybeStrategy implements Strategy {
   constructor(private readonly probability: number = 0.5) {}
 
-  public close(context: StrategyContext): Positions {
-    return Math.random() < this.probability ? any(context.positions) : [];
+  public close(context: StrategyContext): CloseOrders {
+    return Math.random() < this.probability ? any(context.closeorders) : [];
   }
 
   public open(context: StrategyContext): PurchaseOrders {
     return Math.random() < this.probability ? any(context.purchaseorders) : [];
   }
-
 }
 
 /** Create an exchange with a number of instruments availabel */
