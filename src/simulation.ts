@@ -30,25 +30,28 @@ export class Simulation {
     for (const position of expired) this.account.remove(position, bar + 1);
   }
 
-  /** Buy all positions advised by strategy */
-  private buy(bar: Bar): void {
-    // Check if funds are available
-    const amount = this.account.balance;
-    if (amount < 1) return;
+  /** Generate a list of purchase orders for all instruments available at Bar */
+  private makePurchaseOrders(bar: Bar): PurchaseOrders {
+    return this.exchange.on(bar).map((instrument: Instrument) => ({
+      instrument,
+      amount: 1,
+    }));
+  }
 
-    const today: StrategyContext = {
-      amount,
+  /** Gather data for context */
+  private makeContext(bar: Bar): StrategyContext {
+    return {
+      amount: this.account.balance,
       value: this.account.value(bar),
       bar,
-      purchaseorders: this.exchange.on(bar).map((instrument: Instrument) => ({
-        instrument,
-        amount: 1,
-      })),
+      purchaseorders: this.makePurchaseOrders(bar),
       positions: this.account.positions,
     };
+  }
 
-    const orders: PurchaseOrders = this.strategy.open(today);
-
+  /** Buy all positions advised by strategy */
+  private buy(bar: Bar): void {
+    const orders: PurchaseOrders = this.strategy.open(this.makeContext(bar));
     for (const order of orders) {
       this.account.add(order.instrument, order.amount, bar);
     }
@@ -56,19 +59,7 @@ export class Simulation {
 
   /** Sell all positions advised by strategy */
   private sell(bar: Bar): void {
-    const today: StrategyContext = {
-      amount: this.account.balance,
-      value: this.account.value(bar),
-      bar,
-      purchaseorders: this.exchange.on(bar).map((instrument: Instrument) => ({
-        instrument,
-        amount: 1,
-      })),
-      positions: this.account.positions,
-    };
-
-    const positions: Positions = this.strategy.close(today);
-
+    const positions: Positions = this.strategy.close(this.makeContext(bar));
     for (const position of positions) {
       this.account.remove(position, bar);
     }
