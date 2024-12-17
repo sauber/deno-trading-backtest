@@ -1,5 +1,5 @@
 import { Table } from "@sauber/table";
-import type { Position, Positions, PositionID } from "./position.ts";
+import type { Position, PositionID, Positions } from "./position.ts";
 import type { Amount, Bar } from "./types.ts";
 
 /** A collection of instruments */

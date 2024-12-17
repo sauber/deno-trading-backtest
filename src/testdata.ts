@@ -1,10 +1,17 @@
 /** Generate data for testing */
 
-import type { PurchaseOrders, Strategy, StrategyContext } from "./types.ts";
+import { randn } from "@sauber/statistics";
+import type {
+  Price,
+  PurchaseOrders,
+  Strategy,
+  StrategyContext,
+} from "./types.ts";
 import { Position, type PositionID, type Positions } from "./position.ts";
 import { Exchange } from "./exchange.ts";
 import type { Instrument, Instruments } from "./instrument.ts";
 import { TestInstrument } from "./testinstrument.ts";
+import type { Buffer } from "./chart.ts";
 
 // Create array from callback
 function repeat<T>(callback: () => T, count: number): Array<T> {
@@ -66,4 +73,16 @@ export class MaybeStrategy implements Strategy {
 /** Create an exchange with a number of instruments availabel */
 export function makeExchange(count: number): Exchange {
   return new Exchange(makeInstruments(count));
+}
+
+/** Generate a series of numbers for chart */
+export function makeBuffer(count: number): Buffer {
+  const chart: number[] = [];
+  let price: Price = 1000 * Math.random();
+  for (let i = 0; i < count; i++) {
+    const change = (randn() - 0.5) / 5; // +/- 2.5%
+    price *= 1 + change;
+    chart.push(parseFloat(price.toFixed(4)));
+  }
+  return new Float32Array(chart);
 }

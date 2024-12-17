@@ -62,6 +62,5 @@ Deno.test("Statement", () => {
   portfolio.add(position);
 
   const printable = portfolio.toString(position.instrument.end);
-  // console.log(printable);
   assertGreater(printable.length, 0);
 });

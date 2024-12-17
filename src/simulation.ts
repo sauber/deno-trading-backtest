@@ -1,7 +1,6 @@
 import type { Account } from "./account.ts";
 import type { Exchange } from "./exchange.ts";
 import type { Positions } from "./position.ts";
-import { Stats } from "./stats.ts";
 import type { Instruments } from "./instrument.ts";
 import type {
   Bar,
@@ -80,10 +79,5 @@ export class Simulation {
     let bar: Bar = this.exchange.start;
     while (bar >= this.exchange.end) this.step(bar--);
     this.account.withdraw(0, this.exchange.end); // Ensure valuation until end
-  }
-
-  /** Stats from simulation */
-  public get stats(): Stats {
-    return new Stats(this.account);
   }
 }

@@ -72,18 +72,59 @@ Deno.test("Close", () => {
   assertEquals(account.balance, deposit);
 });
 
-Deno.test("Automatic valuation", () => {
-  const deposit: Amount = 100;
-  const start: Bar = 2;
-  const account = new Account(ex, deposit, start);
-  const end: Bar = 0;
-  account.withdraw(deposit, end);
-  assertEquals(account.valuation, [deposit, deposit, deposit]);
-});
-
-Deno.test("List of no trades", () => {
+Deno.test("List of trades", () => {
   const deposit: Amount = 100;
   const start: Bar = 2;
   const account = new Account(ex, deposit, start);
   assertEquals(account.trades.length, 0);
+});
+
+Deno.test("Count of bars", () => {
+  const deposit: Amount = 100;
+  const start: Bar = 2;
+  const end: Bar = 0;
+  const account = new Account(ex, deposit, start);
+  account.withdraw(deposit, end);
+  assertEquals(account.bars, start - end + 1);
+});
+
+Deno.test("Profit", () => {
+  const deposit: Amount = 100;
+  const start: Bar = 2;
+  const account = new Account(ex, deposit, start);
+  account.deposit(deposit, start - 1);
+  assertEquals(account.profit, 1);
+});
+
+Deno.test("WinRatio", () => {
+  const deposit: Amount = 100;
+  const start: Bar = 2;
+  const account = new Account(ex, deposit, start);
+  account.deposit(deposit, start - 1);
+  account.deposit(deposit, start - 2);
+  assertEquals(account.WinRatio, 1);
+});
+
+Deno.test("InvestedRatio", () => {
+  const deposit: Amount = 100;
+  const start: Bar = 2;
+  const account = new Account(ex, deposit, start);
+  account.deposit(deposit, start - 1);
+  account.deposit(deposit, start - 2);
+  assertEquals(account.InvestedRatio, 0);
+});
+
+Deno.test("Plot Cash and Equity stacked", { ignore: true }, () => {
+  const deposit: Amount = 2000;
+  const amount: Amount = 1000;
+  const instrument: Instrument = ex.any();
+  const start: Bar = instrument.start;
+  const end: Bar = instrument.end;
+  const account = new Account(ex, deposit, start + 1);
+  const position = account.add(instrument, amount, start);
+  assertInstanceOf(position, Position);
+  account.remove(position, end);
+  account.withdraw(deposit, end - 1);
+  const printable = account.plot(20, 5);
+  console.log(printable);
 });

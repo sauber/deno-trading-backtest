@@ -1,7 +1,6 @@
-import { plot } from "asciichart";
-import { downsample } from "@sauber/statistics";
 import type { Bar, Price, Symbol } from "./types.ts";
 import type { Buffer } from "./chart.ts";
+import { Chart } from "./chart.ts";
 
 /** Symbol and price series
  * Values are sorted from oldest to newest.
@@ -58,18 +57,10 @@ export class Instrument {
   }
 
   /** Printable Ascii Chart */
-  public plot(height: number = 15, width: number = 78): string {
-    height -= 2;
-    const max = Math.max(
-      ...[this.buffer[0], this.buffer[this.buffer.length - 1]].map((v) =>
-        v.toFixed(2).length
-      ),
-    );
-    const values = downsample(Array.from(this.buffer), width - max);
-    const padding = " ".repeat(max);
-    return (
-      `[ ${this.symbol} - ${this.name}]\n` + plot(values, { height, padding })
-    );
+  public plot(width: number = 78, height: number = 15): string {
+    const header: string = `[ ${this.symbol} - ${this.name}]`;
+    const plot: string = new Chart(this.buffer).plot(width, height - 1);
+    return [header, plot].join("\n");
   }
 }
 

@@ -1,6 +1,7 @@
+import { plot } from "asciichart";
+import { downsample } from "@sauber/statistics";
 import type { Bar, Price } from "./types.ts";
 
-export type Series = Array<Price>;
 export type Buffer = Float32Array;
 
 /**
@@ -15,17 +16,15 @@ export class Chart {
   public readonly start: Bar;
 
   /** Memory compacted series */
-  private readonly buffer: Buffer;
+  // private readonly buffer: Buffer;
 
   constructor(
     /** Series of chart values array */
-    series: Series = [],
+    private readonly buffer: Buffer,
     /** Bar index of most recent value */
     public readonly end: Bar = 0,
   ) {
-    this.start = this.end + series.length - 1;
-    // this.first = series[0];
-    this.buffer = new Float32Array(series);
+    this.start = this.end + buffer.length - 1;
   }
 
   /** Most recent value in series */
@@ -60,15 +59,20 @@ export class Chart {
     return this.buffer[index];
   }
 
-  /** Extend series with value */
-  // public add(price: Price): void {
-  //   this.series.push(price);
-  //   --this.end;
-  // }
-
   /** Array of all values */
   public get values(): Buffer {
     return this.buffer;
   }
-}
 
+  /** Printable Ascii Chart */
+  public plot(width: number = 78, height: number = 15): string {
+    const max = Math.max(
+      ...[this.buffer[0], this.buffer[this.buffer.length - 1]].map((v) =>
+        v.toFixed(2).length
+      ),
+    );
+    const values = downsample(Array.from(this.buffer), width - max - 2);
+    const padding = " ".repeat(max);
+    return plot(values, { height: height - 1, padding });
+  }
+}

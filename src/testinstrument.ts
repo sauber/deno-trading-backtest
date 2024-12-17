@@ -1,21 +1,9 @@
 /** Generate data for testing */
 import { nanoid } from "nanoid";
 import { Instrument } from "./instrument.ts";
-import { randn } from "@sauber/statistics";
-import type { Bar, Price } from "./types.ts";
-import type { Series } from "./chart.ts";
-
-/** Generate a random chart */
-function makeSeries(count: number): Series {
-  const chart: Series = [];
-  let price: Price = 1000 * Math.random();
-  for (let i = 0; i < count; i++) {
-    const change = (randn() - 0.5) / 5; // +/- 2.5%
-    price *= 1 + change;
-    chart.push(parseFloat(price.toFixed(4)));
-  }
-  return chart;
-}
+import type { Bar } from "./types.ts";
+import type { Buffer } from "./chart.ts";
+import { makeBuffer } from "./testdata.ts";
 
 /** Generate a random ticker symbol */
 function makeSymbol(): string {
@@ -85,8 +73,8 @@ export class TestInstrument extends Instrument {
   constructor(length: number = 730) {
     const symbol: string = makeSymbol();
     const name: string = makeName(symbol);
-    const series: Series = makeSeries(length);
+    const series: Buffer = makeBuffer(length);
     const end: Bar = Math.floor(Math.random() * length / 5);
-    super(new Float32Array(series), end, symbol, name);
+    super(series, end, symbol, name);
   }
 }
