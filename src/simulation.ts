@@ -1,9 +1,11 @@
 import type { Account } from "./account.ts";
 import type { Exchange } from "./exchange.ts";
-import type { Positions } from "./position.ts";
+import type { Position, Positions } from "./position.ts";
 import type { Instruments } from "./instrument.ts";
 import type {
   Bar,
+  CloseOrders,
+  PurchaseOrder,
   PurchaseOrders,
   Strategy,
   StrategyContext,
@@ -23,61 +25,73 @@ export class Simulation {
   /** Expire all positions no longer having data at bar */
   private expire(bar: Bar): void {
     const available: Instruments = this.exchange.on(bar);
-    const expired: Positions = this.account.positions.filter((position) =>
-      !available.includes(position.instrument)
-    );
-    for (const position of expired) this.account.remove(position, bar + 1);
+    const positions: Positions = this.account.positions;
+    const prev: Bar = bar + 1;
+    for (let i = 0; i < positions.length; i++) {
+      const position = positions[i];
+      if (!available.includes(position.instrument)) {
+        this.account.remove(position, prev);
+      }
+    }
+  }
+
+  /** Generate a list of close orders for all open positions */
+  private makeCloseOrders(): CloseOrders {
+    return this.account.positions.map((position: Position) => ({
+      position,
+      confidence: 1,
+    }));
+  }
+
+  /** Generate a list of purchase orders for all instruments available at Bar */
+  private makePurchaseOrders(bar: Bar): PurchaseOrders {
+    const instruments: Instruments = this.exchange.on(bar);
+    const po: PurchaseOrders = Array<PurchaseOrder>(instruments.length);
+    for (let i = 0; i < instruments.length; i++) {
+      po[i] = { instrument: instruments[i], amount: 1 };
+    }
+    return po;
+  }
+
+  /** Gather data for context */
+  private makeContext(bar: Bar): StrategyContext {
+    return {
+      amount: this.account.balance,
+      value: this.account.value(bar),
+      bar,
+      purchaseorders: this.makePurchaseOrders(bar),
+      closeorders: this.makeCloseOrders(),
+    };
   }
 
   /** Buy all positions advised by strategy */
-  private buy(bar: Bar): void {
-    // Check if funds are available
-    const amount = this.account.balance;
-    if (amount < 1) return;
-
-    const today: StrategyContext = {
-      amount,
-      value: this.account.value(bar),
-      bar,
-      instruments: this.exchange.on(bar),
-      positions: this.account.positions,
-    };
-
-    const orders: PurchaseOrders = this.strategy.open(today);
-
-    for (const order of orders) {
-      this.account.add(order.instrument, order.amount, bar);
+  private buy(context: StrategyContext): void {
+    const orders: PurchaseOrders = this.strategy.open(context);
+    for (let i = 0; i < orders.length; i++) {
+      this.account.add(orders[i].instrument, orders[i].amount, context.bar);
     }
   }
 
   /** Sell all positions advised by strategy */
-  private sell(bar: Bar): void {
-    const today: StrategyContext = {
-      amount: this.account.balance,
-      value: this.account.value(bar),
-      bar,
-      instruments: this.exchange.on(bar),
-      positions: this.account.positions,
-    };
-
-    const positions: Positions = this.strategy.close(today);
-
-    for (const position of positions) {
-      this.account.remove(position, bar);
+  private sell(context: StrategyContext): void {
+    const orders: CloseOrders = this.strategy.close(context);
+    for (let i = 0; i < orders.length; i++) {
+      this.account.remove(orders[i].position, context.bar);
     }
   }
 
   /** Perform one step of simulation */
   private step(bar: Bar): void {
     this.expire(bar);
-    this.sell(bar);
-    this.buy(bar);
+    const context: StrategyContext = this.makeContext(bar);
+    this.sell(context);
+    this.buy(context);
   }
 
   /** Run steps of simulation from start to end */
   public run(): void {
-    let bar: Bar = this.exchange.start;
-    while (bar >= this.exchange.end) this.step(bar--);
-    this.account.withdraw(0, this.exchange.end); // Ensure valuation until end
+    for (let bar = this.exchange.start; bar >= this.exchange.end; --bar) {
+      this.step(bar);
+    }
   }
 }

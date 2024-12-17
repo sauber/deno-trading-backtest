@@ -3,7 +3,7 @@ import { Simulation } from "./simulation.ts";
 import { makeExchange, MaybeStrategy } from "./testdata.ts";
 import type { Strategy } from "./types.ts";
 
-// Create an Exchange with a numebr instruments available
+// Create an Exchange with a number of instruments available
 const exchange: Exchange = makeExchange(500);
 
 // Create Strategy

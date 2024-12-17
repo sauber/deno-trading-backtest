@@ -242,7 +242,9 @@ export class Account {
       "Cash",
       "Value",
     ];
-    table.rows = this.journal.list.map((t) => [
+    table.rows = this.journal.list.filter((t) => t.summary != "Valuation").map((
+      t,
+    ) => [
       t.bar,
       t.summary,
       ("position" in t) ? t.position.instrument.symbol : "",
