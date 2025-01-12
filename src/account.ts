@@ -226,6 +226,7 @@ export class Account {
 
   /** Combined value of positions and balance */
   public value(bar: Bar): Amount {
+    this.valuate(bar);
     const saldo: Saldo = this.journal.saldo(bar);
     const sum: number = saldo.cash + saldo.equity;
     return sum;
