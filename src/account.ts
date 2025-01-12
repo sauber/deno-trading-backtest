@@ -73,9 +73,12 @@ class Journal {
 
   /** Find first transaction at bar */
   public saldo(bar: Bar): Saldo {
-    return (bar > this.start || bar < this.end)
-      ? { cash: 0, equity: 0 }
-      : this.list.find((t) => t.bar === bar) as unknown as Saldo;
+    const transaction: Transaction | undefined =
+      (bar > this.start || bar < this.end)
+        ? undefined
+        : this.list.find((t) => t.bar === bar);
+    if (transaction) return transaction.saldo;
+    return { cash: 0, equity: 0 };
   }
 
   /** Daily saldo from start to end */
@@ -223,8 +226,9 @@ export class Account {
 
   /** Combined value of positions and balance */
   public value(bar: Bar): Amount {
-    const saldo = this.journal.saldo(bar);
-    return saldo.cash + saldo.equity;
+    const saldo: Saldo = this.journal.saldo(bar);
+    const sum: number = saldo.cash + saldo.equity;
+    return sum;
   }
 
   /** A printable statement */

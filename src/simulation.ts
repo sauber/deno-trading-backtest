@@ -55,13 +55,14 @@ export class Simulation {
 
   /** Gather data for context */
   private makeContext(bar: Bar): StrategyContext {
-    return {
+    const context: StrategyContext = {
       amount: this.account.balance,
       value: this.account.value(bar),
       bar,
       purchaseorders: this.makePurchaseOrders(bar),
       closeorders: this.makeCloseOrders(),
     };
+    return context;
   }
 
   /** Buy all positions advised by strategy */
