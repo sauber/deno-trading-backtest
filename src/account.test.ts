@@ -114,6 +114,18 @@ Deno.test("InvestedRatio", () => {
   assertEquals(account.InvestedRatio, 0);
 });
 
+Deno.test("Standard Deviation", () => {
+  const deposit: Amount = 100;
+  const start: Bar = 2;
+  const account = new Account(ex, deposit, start);
+  account.deposit(deposit, start - 1);
+  account.deposit(deposit, start - 2);
+  const s: number = account.stddev;
+  console.log({s});
+  // assertEquals(account.InvestedRatio, 0);
+});
+
+
 Deno.test("Plot Cash and Equity stacked", { ignore: true }, () => {
   const deposit: Amount = 2000;
   const amount: Amount = 1000;

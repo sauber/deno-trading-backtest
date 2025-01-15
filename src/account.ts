@@ -1,6 +1,6 @@
 import * as asciichart from "asciichart";
 import { Table } from "@sauber/table";
-import { downsample } from "@sauber/statistics";
+import { downsample, std } from "@sauber/statistics";
 import { Portfolio } from "./portfolio.ts";
 import type { Position } from "./position.ts";
 import type { Amount, Bar, Price } from "./types.ts";
@@ -324,5 +324,13 @@ export class Account {
     };
 
     return asciichart.plot([v1, v2], config);
+  }
+
+  /** Standard deviation of log of daily total value */
+  public get stddev(): number {
+    const saldo = this.journal.daily();
+    const logValue = saldo.map((s) => Math.log(s.cash + s.equity));
+    const stddev: number = std(logValue);
+    return Math.exp(stddev);
   }
 }
