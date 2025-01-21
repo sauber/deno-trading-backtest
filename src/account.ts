@@ -1,12 +1,13 @@
 import * as asciichart from "asciichart";
 import { Table } from "@sauber/table";
-import { downsample, std } from "@sauber/statistics";
+import { downsample, regression, std } from "@sauber/statistics";
 import { Portfolio } from "./portfolio.ts";
 import type { Position } from "./position.ts";
 import type { Amount, Bar, Price } from "./types.ts";
 import type { Instrument } from "./instrument.ts";
 import type { Exchange } from "./exchange.ts";
 import { Trade } from "./trade.ts";
+import { Chart } from "./chart.ts";
 
 type Saldo = {
   cash: Amount;
@@ -302,6 +303,19 @@ export class Account {
     return r;
   }
 
+  /** How much chart diverts from exponential curve */
+  public get fragility(): number {
+    const val: number[] = this.journal.daily().map((v) => v.equity + v.cash);
+    const reg = regression(val.map((v) => Math.log(v)));
+    const curve: number[] = val.map((_, i) =>
+      Math.exp(reg.intercept + reg.gradiant * i)
+    );
+    const dev: number = std(val.map((v, i) => v - curve[i]));
+    const mean: number = val.slice().sort()[Math.floor(val.length / 2)];
+    const fragility = dev / mean;
+    return fragility;
+  }
+
   /** Printable Ascii Chart */
   public plot(width: number = 78, height: number = 15): string {
     const saldo = this.journal.daily();
@@ -330,6 +344,7 @@ export class Account {
   public get stddev(): number {
     const saldo = this.journal.daily();
     const logValue = saldo.map((s) => Math.log(s.cash + s.equity));
+    console.log({ logValue });
     const stddev: number = std(logValue);
     return Math.exp(stddev);
   }

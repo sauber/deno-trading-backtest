@@ -1,4 +1,4 @@
-import { assertEquals, assertInstanceOf } from "@std/assert";
+import { assertAlmostEquals, assertEquals, assertInstanceOf } from "@std/assert";
 import { Account } from "./account.ts";
 import { makeInstruments } from "./testdata.ts";
 import { Exchange } from "./exchange.ts";
@@ -121,10 +121,18 @@ Deno.test("Standard Deviation", () => {
   account.deposit(deposit, start - 1);
   account.deposit(deposit, start - 2);
   const s: number = account.stddev;
-  console.log({s});
-  // assertEquals(account.InvestedRatio, 0);
+  assertAlmostEquals(s, 1.3864585836671228);
 });
 
+Deno.test("Fragility Index", () => {
+  const deposit: Amount = 100;
+  const start: Bar = 2;
+  const account = new Account(ex, deposit, start);
+  account.deposit(deposit * 1.1, start - 1);
+  account.deposit(deposit * 1.1 * 1.1, start - 2);
+  const f: number = account.fragility;
+  assertAlmostEquals(f, 0.22344715334733195);
+});
 
 Deno.test("Plot Cash and Equity stacked", { ignore: true }, () => {
   const deposit: Amount = 2000;
@@ -138,5 +146,4 @@ Deno.test("Plot Cash and Equity stacked", { ignore: true }, () => {
   account.remove(position, end);
   account.withdraw(deposit, end - 1);
   const printable = account.plot(20, 5);
-  console.log(printable);
 });
