@@ -30,7 +30,7 @@ export class Simulation {
     for (let i = 0; i < positions.length; i++) {
       const position = positions[i];
       if (!available.includes(position.instrument)) {
-        this.account.remove(position, prev);
+        this.account.remove(position, prev, "Expire");
       }
     }
   }

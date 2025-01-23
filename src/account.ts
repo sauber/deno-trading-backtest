@@ -193,7 +193,7 @@ export class Account {
 
   /** Remove position from portfolio, add return to cash */
   // Get amount from exchange transaction
-  public remove(position: Position, bar: Bar = 0): boolean {
+  public remove(position: Position, bar: Bar = 0, reason: string ="Close"): boolean {
     // Only close if actually in portfolio
     if (!this.portfolio.has(position)) return false;
 
@@ -205,7 +205,7 @@ export class Account {
     const prev: Saldo = this.journal.last;
     const transaction: Transaction = {
       bar,
-      summary: "Close",
+      summary: reason,
       amount,
       position,
       price: amount / position.units,
@@ -344,7 +344,6 @@ export class Account {
   public get stddev(): number {
     const saldo = this.journal.daily();
     const logValue = saldo.map((s) => Math.log(s.cash + s.equity));
-    console.log({ logValue });
     const stddev: number = std(logValue);
     return Math.exp(stddev);
   }
