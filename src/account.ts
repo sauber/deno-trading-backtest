@@ -124,9 +124,9 @@ export class Account {
     for (let i = 0; i < positions.length; i++) {
       const position: Position = positions[i];
       // if (!available.includes(position.instrument)) {
-      if ( position.instrument.end > bar)
+      if (position.instrument.end > bar) {
         this.remove(position, prev, "Expire");
-      
+      }
     }
   }
 
@@ -141,10 +141,9 @@ export class Account {
     if (this.journal.end === Infinity) return;
 
     // Catch up until bar
-    const cash: Amount = this.journal.last.cash;
     for (let index = this.journal.end - 1; index >= bar; index--) {
-      // console.log("Valuation", index);
       this.expire(index);
+      const cash: Amount = this.journal.last.cash;
       const equity: number = this.portfolio.value(index);
       const saldo: Saldo = { cash, equity };
       const valuation: Valuation = { bar: index, summary: "Valuation", saldo };

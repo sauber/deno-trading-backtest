@@ -177,5 +177,5 @@ Deno.test("Plot Cash and Equity stacked", { ignore: true }, () => {
   assertInstanceOf(position, Position);
   account.remove(position, end, "Close");
   account.withdraw(deposit, end - 1);
-  const printable = account.plot(20, 5);
+  
 });
