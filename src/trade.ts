@@ -1,12 +1,13 @@
 import type { Position } from "./position.ts";
-import type { Amount, Bar } from "./types.ts";
+import type { Amount, Bar, Reason } from "./types.ts";
 
 /** Position that has been opened and closed */
 export class Trade {
   constructor(
-    private readonly position: Position,
-    private readonly end: Bar,
-    private readonly amount: Amount,
+    public readonly position: Position,
+    public readonly end: Bar,
+    public readonly amount: Amount,
+    public readonly reason: Reason,
   ) {}
 
   /** Number for bars from start to end */

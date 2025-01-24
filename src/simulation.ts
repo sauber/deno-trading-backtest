@@ -1,6 +1,6 @@
 import type { Account } from "./account.ts";
 import type { Exchange } from "./exchange.ts";
-import type { Position, Positions } from "./position.ts";
+import type { Position } from "./position.ts";
 import type { Instruments } from "./instrument.ts";
 import type {
   Bar,
@@ -20,19 +20,6 @@ export class Simulation {
     deposit: number = 10000,
   ) {
     this.account = exchange.createAccount(deposit, exchange.start);
-  }
-
-  /** Expire all positions no longer having data at bar */
-  private expire(bar: Bar): void {
-    const available: Instruments = this.exchange.on(bar);
-    const positions: Positions = this.account.positions;
-    const prev: Bar = bar + 1;
-    for (let i = 0; i < positions.length; i++) {
-      const position = positions[i];
-      if (!available.includes(position.instrument)) {
-        this.account.remove(position, prev, "Expire");
-      }
-    }
   }
 
   /** Generate a list of close orders for all open positions */
@@ -77,13 +64,12 @@ export class Simulation {
   private sell(context: StrategyContext): void {
     const orders: CloseOrders = this.strategy.close(context);
     for (let i = 0; i < orders.length; i++) {
-      this.account.remove(orders[i].position, context.bar);
+      this.account.remove(orders[i].position, context.bar, "Close");
     }
   }
 
   /** Perform one step of simulation */
   private step(bar: Bar): void {
-    this.expire(bar);
     const context: StrategyContext = this.makeContext(bar);
     this.sell(context);
     this.buy(context);

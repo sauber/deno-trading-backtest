@@ -3,11 +3,10 @@ import { Table } from "@sauber/table";
 import { downsample, regression, std } from "@sauber/statistics";
 import { Portfolio } from "./portfolio.ts";
 import type { Position } from "./position.ts";
-import type { Amount, Bar, Price } from "./types.ts";
+import type { Amount, Bar, Price, Reason } from "./types.ts";
 import type { Instrument } from "./instrument.ts";
 import type { Exchange } from "./exchange.ts";
 import { Trade } from "./trade.ts";
-import { Chart } from "./chart.ts";
 
 type Saldo = {
   cash: Amount;
@@ -117,6 +116,20 @@ export class Account {
     return this.journal.last.cash;
   }
 
+  /** Remove any positions that have expired */
+  private expire(bar: Bar): void {
+    // const available: Instrument[] = this.exchange.on(bar);
+    const positions: Position[] = this.portfolio.positions;
+    const prev: Bar = bar + 1;
+    for (let i = 0; i < positions.length; i++) {
+      const position: Position = positions[i];
+      // if (!available.includes(position.instrument)) {
+      if ( position.instrument.end > bar)
+        this.remove(position, prev, "Expire");
+      
+    }
+  }
+
   /** Valuation at each bar */
   private valuate(bar: Bar): void {
     if (bar > this.journal.end) {
@@ -130,6 +143,8 @@ export class Account {
     // Catch up until bar
     const cash: Amount = this.journal.last.cash;
     for (let index = this.journal.end - 1; index >= bar; index--) {
+      // console.log("Valuation", index);
+      this.expire(index);
       const equity: number = this.portfolio.value(index);
       const saldo: Saldo = { cash, equity };
       const valuation: Valuation = { bar: index, summary: "Valuation", saldo };
@@ -193,14 +208,19 @@ export class Account {
 
   /** Remove position from portfolio, add return to cash */
   // Get amount from exchange transaction
-  public remove(position: Position, bar: Bar = 0, reason: string ="Close"): boolean {
+  public remove(
+    position: Position,
+    bar: Bar = 0,
+    reason: Reason,
+  ): boolean {
+    this.valuate(bar);
+
     // Only close if actually in portfolio
     if (!this.portfolio.has(position)) return false;
 
     // Let exchange return amount from position
     const amount: Amount = this.exchange.sell(position, bar);
 
-    this.valuate(bar);
     this.portfolio.remove(position);
     const prev: Saldo = this.journal.last;
     const transaction: Transaction = {
@@ -214,7 +234,7 @@ export class Account {
     this.journal.add(transaction);
 
     // Record completed trade
-    const trade = new Trade(position, bar, amount);
+    const trade = new Trade(position, bar, amount, reason);
     this.trades.push(trade);
 
     return true;
@@ -346,5 +366,16 @@ export class Account {
     const logValue = saldo.map((s) => Math.log(s.cash + s.equity));
     const stddev: number = std(logValue);
     return Math.exp(stddev);
+  }
+
+  /** Ratio of positions closed due to expiration */
+  public get expireRatio(): number {
+    const expired: number =
+      this.journal.list.filter((t) => t.summary === "Expire").length;
+    const closed: number =
+      this.journal.list.filter((t) => t.summary === "Close").length;
+
+    const ratio: number = expired / (closed + expired);
+    return ratio;
   }
 }

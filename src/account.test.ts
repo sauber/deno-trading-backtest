@@ -1,4 +1,8 @@
-import { assertAlmostEquals, assertEquals, assertInstanceOf } from "@std/assert";
+import {
+  assertAlmostEquals,
+  assertEquals,
+  assertInstanceOf,
+} from "@std/assert";
 import { Account } from "./account.ts";
 import { makeInstruments } from "./testdata.ts";
 import { Exchange } from "./exchange.ts";
@@ -68,8 +72,13 @@ Deno.test("Close", () => {
   const account = new Account(ex, deposit, start);
   const position = account.add(instrument, amount, start);
   assertInstanceOf(position, Position);
-  account.remove(position, start);
+  const removed: boolean = account.remove(position, start, "Close");
   assertEquals(account.balance, deposit);
+  assertEquals(removed, true);
+
+  // Confirm that position cannot close again
+  const removedAgain: boolean = account.remove(position, start, "Close");
+  assertEquals(removedAgain, false);
 });
 
 Deno.test("List of trades", () => {
@@ -134,6 +143,29 @@ Deno.test("Fragility Index", () => {
   assertAlmostEquals(f, 0.22344715334733195);
 });
 
+Deno.test("Expiration Ratio", () => {
+  const deposit: Amount = 2000;
+  const amount: Amount = 100;
+
+  // Two instruments with different end bars
+  let instr1: Instrument, instr2: Instrument;
+  do {
+    [instr1, instr2] = makeInstruments(2) as [Instrument, Instrument];
+  } while (instr1.end == instr2.end);
+
+  const start: Bar = Math.min(instr1.start, instr2.start);
+  const end: Bar = Math.min(instr1.end, instr2.end);
+  const account = new Account(ex, deposit, start);
+  const pos1 = account.add(instr1, amount, start) as Position;
+  const pos2 = account.add(instr2, amount, start) as Position;
+
+  // Attempt to close both at the same end date, to ensure one is expired.
+  account.remove(pos1, end, "Close");
+  account.remove(pos2, end, "Close");
+  const ratio: number = account.expireRatio;
+  assertEquals(ratio, 0.5);
+});
+
 Deno.test("Plot Cash and Equity stacked", { ignore: true }, () => {
   const deposit: Amount = 2000;
   const amount: Amount = 1000;
@@ -143,7 +175,7 @@ Deno.test("Plot Cash and Equity stacked", { ignore: true }, () => {
   const account = new Account(ex, deposit, start + 1);
   const position = account.add(instrument, amount, start);
   assertInstanceOf(position, Position);
-  account.remove(position, end);
+  account.remove(position, end, "Close");
   account.withdraw(deposit, end - 1);
   const printable = account.plot(20, 5);
 });

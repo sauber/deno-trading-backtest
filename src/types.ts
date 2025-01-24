@@ -59,3 +59,8 @@ export type Strategy = {
   // Generate list of positions to open
   open: (context: StrategyContext) => PurchaseOrders;
 };
+
+/** Valid reasons for closing position */
+export type Reason = "Close" | "Expire" | "Loss" | "Profit";
+
+
