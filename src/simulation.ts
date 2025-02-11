@@ -47,6 +47,7 @@ export class Simulation {
       value: this.account.value(bar),
       bar,
       purchaseorders: this.makePurchaseOrders(bar),
+      positions: this.account.positions,
       closeorders: this.makeCloseOrders(),
     };
     return context;

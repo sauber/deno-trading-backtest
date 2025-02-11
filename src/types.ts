@@ -1,4 +1,4 @@
-import type { Position } from "./position.ts";
+import type { Position, Positions } from "./position.ts";
 import type { Instrument } from "./instrument.ts";
 
 /** Symbol is a string */
@@ -46,6 +46,9 @@ export type StrategyContext = {
 
   /** Instruments available at index */
   purchaseorders: PurchaseOrders;
+
+  /** Current open positions */
+  positions: Positions;
 
   /** Current open positions */
   closeorders: CloseOrders;
