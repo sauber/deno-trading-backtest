@@ -86,7 +86,7 @@ export class Portfolio {
         money(positionValue),
       ];
     });
-    t.title = `Portfolio position=${this.length}, invested=${
+    t.title = `Portfolio bar=${bar} position=${this.length}, invested=${
       money(
         invested,
       )
