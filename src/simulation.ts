@@ -72,8 +72,8 @@ export class Simulation {
   /** Perform one step of simulation */
   private step(bar: Bar): void {
     const context: StrategyContext = this.makeContext(bar);
-    this.sell(context);
     this.buy(context);
+    this.sell(context);
   }
 
   /** Run steps of simulation from start to end */
