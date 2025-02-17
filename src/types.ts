@@ -25,9 +25,14 @@ export type PurchaseOrder = {
 /** A list of Purchase orders */
 export type PurchaseOrders = Array<PurchaseOrder>;
 
+/** Valid reasons for closing position */
+export type Reason = "Close" | "Expire" | "Loss" | "Profit" | "Take";
+
+/** A position, and reason to close */
 export type CloseOrder = {
   readonly position: Position;
   readonly confidence: Confidence;
+  readonly reason: Reason;
 };
 
 /** A list of close orders */
@@ -62,8 +67,3 @@ export type Strategy = {
   // Generate list of positions to open
   open: (context: StrategyContext) => PurchaseOrders;
 };
-
-/** Valid reasons for closing position */
-export type Reason = "Close" | "Expire" | "Loss" | "Profit";
-
-
