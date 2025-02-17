@@ -27,6 +27,7 @@ export class Simulation {
     return this.account.positions.map((position: Position) => ({
       position,
       confidence: 1,
+      reason: "Close",
     }));
   }
 
@@ -56,16 +57,16 @@ export class Simulation {
   /** Buy all positions advised by strategy */
   private buy(context: StrategyContext): void {
     const orders: PurchaseOrders = this.strategy.open(context);
-    for (let i = 0; i < orders.length; i++) {
-      this.account.add(orders[i].instrument, orders[i].amount, context.bar);
+    for (const order of orders) {
+      this.account.add(order.instrument, order.amount, context.bar);
     }
   }
 
   /** Sell all positions advised by strategy */
   private sell(context: StrategyContext): void {
     const orders: CloseOrders = this.strategy.close(context);
-    for (let i = 0; i < orders.length; i++) {
-      this.account.remove(orders[i].position, context.bar, "Close");
+    for (const order of orders) {
+      this.account.remove(order.position, context.bar, order.reason);
     }
   }
 

@@ -118,12 +118,10 @@ export class Account {
 
   /** Remove any positions that have expired */
   private expire(bar: Bar): void {
-    // const available: Instrument[] = this.exchange.on(bar);
     const positions: Position[] = this.portfolio.positions;
     const prev: Bar = bar + 1;
     for (let i = 0; i < positions.length; i++) {
       const position: Position = positions[i];
-      // if (!available.includes(position.instrument)) {
       if (position.instrument.end > bar) {
         this.remove(position, prev, "Expire");
       }
@@ -206,7 +204,6 @@ export class Account {
   }
 
   /** Remove position from portfolio, add return to cash */
-  // Get amount from exchange transaction
   public remove(
     position: Position,
     bar: Bar = 0,
