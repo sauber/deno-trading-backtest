@@ -364,14 +364,12 @@ export class Account {
     return Math.exp(stddev);
   }
 
-  /** Ratio of positions closed due to expiration */
-  public get expireRatio(): number {
-    const expired: number =
-      this.journal.list.filter((t) => t.summary === "Expire").length;
+  /** Ratio of positions closed normally */
+  public get closeRatio(): number {
     const closed: number =
-      this.journal.list.filter((t) => t.summary === "Close").length;
+      this.trades.filter((t) => t.reason === "Close").length;
 
-    const ratio: number = expired / (closed + expired);
+    const ratio: number = closed / this.trades.length;
     return ratio;
   }
 }
