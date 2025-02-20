@@ -250,7 +250,7 @@ export class Account {
   }
 
   /** A printable statement */
-  public get toString(): string {
+  public toString(): string {
     const money = (v: number): number => parseFloat(v.toFixed(2));
     const table = new Table();
     table.title = "Transactions";
