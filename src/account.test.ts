@@ -143,7 +143,7 @@ Deno.test("Fragility Index", () => {
   assertAlmostEquals(f, 0.22344715334733195);
 });
 
-Deno.test("Expiration Ratio", () => {
+Deno.test("Close Ratio", () => {
   const deposit: Amount = 2000;
   const amount: Amount = 100;
 
@@ -162,7 +162,7 @@ Deno.test("Expiration Ratio", () => {
   // Attempt to close both at the same end date, to ensure one is expired.
   account.remove(pos1, end, "Close");
   account.remove(pos2, end, "Close");
-  const ratio: number = account.expireRatio;
+  const ratio: number = account.closeRatio;
   assertEquals(ratio, 0.5);
 });
 

@@ -18,7 +18,7 @@ simulation.run();
 const account: Account = simulation.account;
 
 // Print list of transaction, positions and performance stats
-console.log(account.toString);
+console.log(account.toString());
 console.log(account.portfolio.toString(exchange.end));
 console.log(account.plot(60, 10));
 console.log(
