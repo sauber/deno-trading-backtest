@@ -20,7 +20,7 @@ export class Chart {
 
   constructor(
     /** Series of chart values array */
-    private readonly buffer: Buffer,
+    protected readonly buffer: Buffer,
     /** Bar index of most recent value */
     public readonly end: Bar = 0,
   ) {
