@@ -67,7 +67,7 @@ export class Chart {
   /** Printable Ascii Chart */
   public plot(width: number = 78, height: number = 15): string {
     const max = Math.max(
-      ...[this.buffer[0], this.buffer[this.buffer.length - 1]].map((v) =>
+      ...this.buffer.map((v) =>
         v.toFixed(2).length
       ),
     );
