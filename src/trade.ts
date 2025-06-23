@@ -10,8 +10,13 @@ export class Trade {
     public readonly reason: Reason,
   ) {}
 
-  /** Number for bars from start to end */
+  /** Number of bars from start to end */
   public get length(): number {
     return this.position.start - this.end;
+  }
+
+  /** Result of trade */
+  public get profit(): Amount {
+    return this.position.value(this.end) - this.position.value(this.position.start);
   }
 }

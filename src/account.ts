@@ -308,6 +308,13 @@ export class Account {
     return gain / move;
   }
 
+  /** Ratio of winning trades */
+  public get WinRatioTrades(): number {
+    const totalTrades = this.trades.length;
+    const winningTrades = this.trades.filter((t) => t.profit > 0).length;
+    return totalTrades === 0 ? 0 : winningTrades / totalTrades;
+  }
+
   /** On average, of total value how much is invested */
   public get InvestedRatio(): number {
     const val: Saldo[] = this.journal.daily();

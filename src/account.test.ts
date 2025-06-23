@@ -114,6 +114,15 @@ Deno.test("WinRatio", () => {
   assertEquals(account.WinRatio, 1);
 });
 
+Deno.test("WinRatioTrades", () => {
+  const deposit: Amount = 100;
+  const start: Bar = 2;
+  const account = new Account(ex, deposit, start);
+  account.deposit(deposit, start - 1);
+  account.deposit(deposit, start - 2);
+  assertEquals(account.WinRatioTrades, 0);
+});
+
 Deno.test("InvestedRatio", () => {
   const deposit: Amount = 100;
   const start: Bar = 2;

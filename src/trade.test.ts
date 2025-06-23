@@ -9,11 +9,19 @@ const position: Position = makePosition(amount);
 const end: Bar = position.instrument.end;
 
 Deno.test("Instance", () => {
-    const trade = new Trade(position, end, amount, "Close");
-    assertInstanceOf(trade, Trade);
+  const trade = new Trade(position, end, amount, "Close");
+  assertInstanceOf(trade, Trade);
 });
 
 Deno.test("Length", () => {
-    const trade = new Trade(position, end, amount, "Close");
-    assertEquals(trade.length, position.instrument.start - end);
+  const trade = new Trade(position, end, amount, "Close");
+  assertEquals(trade.length, position.instrument.start - end);
+});
+
+Deno.test("Profit", () => {
+  const trade = new Trade(position, end, amount, "Close");
+  assertEquals(
+    trade.profit,
+    position.value(end) - position.value(position.start),
+  );
 });
