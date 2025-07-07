@@ -2,7 +2,7 @@
 
 import { randn } from "@sauber/statistics";
 import type {
-CloseOrders,
+  CloseOrders,
   Price,
   PurchaseOrders,
   Strategy,
@@ -18,8 +18,8 @@ function repeat<T>(callback: () => T, count: number): Array<T> {
   return Array.from(Array(count).keys().map(callback));
 }
 
-/** Pick a random item from an array */
-function any<T>(items: Array<T>): Array<T> {
+/** Pick a random item from an array, or zero if array is empty */
+function any<T>(items: Array<T>): [] | [T] {
   const count = items.length;
   if (count < 1) return [];
   const index = Math.floor(Math.random() * count);
@@ -28,7 +28,7 @@ function any<T>(items: Array<T>): Array<T> {
 
 /** A list of random instruments */
 export function makeInstruments(count: number): Instruments {
-  return repeat(()=>createTestInstrument(), count);
+  return repeat<Instrument>(() => createTestInstrument(), count);
 }
 
 // Generate a position
@@ -43,7 +43,7 @@ export function makePosition(amount: number): Position {
 
 /** A list of random instruments */
 export function makePositions(count: number, amount: number): Positions {
-  return repeat(() => makePosition(amount / count), count);
+  return repeat<Position>(() => makePosition(amount / count), count);
 }
 
 /** Maybe buy a positions, maybe close a position */
