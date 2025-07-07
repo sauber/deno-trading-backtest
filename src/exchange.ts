@@ -32,6 +32,7 @@ export class Exchange {
     return new Account(this, deposit, start);
   }
 
+  /** A random instrument */
   public any(): Instrument {
     return this
       .instruments[Math.floor(Math.random() * this.instruments.length)];
