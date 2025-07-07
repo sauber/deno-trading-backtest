@@ -1,15 +1,18 @@
+import { plot } from "asciichart";
+import { downsample } from "@sauber/statistics";
 import type { Bar, Price, Symbol } from "./types.ts";
-import type { Buffer } from "./chart.ts";
-import { Chart } from "./chart.ts";
 
-/** Symbol and price series
+export type Buffer = Float32Array;
+
+/**
+ * Instrument with price series.
  * Values are sorted from oldest to newest.
  * Bar index indicates the age.
  * "end" is newest bar index, and "start" is oldest.
  * For example if end is bar index 0, then bar index 1 is the prior value.
  */
 export class Instrument {
-  /** Bar Index of first item in array, ie oldest entry */
+  /** Bar Index of last item in array, more old entry */
   public readonly start: Bar;
 
   /** Oldest value in chart */
@@ -22,16 +25,16 @@ export class Instrument {
   public readonly length: number;
 
   /**
-   * @param series - prices from start to end
-   * @param end - Index of last bar in chart
+   * @param buffer - prices from start to end
+   * @param end - Index of last bar in price series
    * @param symbol - Short name of instrument
-   * @param name - Full name of instrument
+   * @param name - Long name of instrument
    */
   constructor(
     public readonly buffer: Buffer,
-    public readonly end: Bar,
-    public readonly symbol: Symbol,
-    public readonly name?: string,
+    public readonly end: Bar = 0,
+    public readonly symbol: Symbol = "",
+    public readonly name: string = "",
   ) {
     this.start = this.end + this.buffer.length - 1;
     this.first = this.buffer[0];
@@ -39,28 +42,42 @@ export class Instrument {
     this.length = this.buffer.length;
   }
 
-  /** Active if bar within series range */
-  public active(bar: Bar): boolean {
+  /** Confirm if data is available at bar index */
+  public has(bar: Bar): boolean {
     return bar >= this.end && bar <= this.start;
   }
 
-  /** Random price with 10% of base price */
+  /** Look up value at bar index */
   public price(bar: Bar): Price {
-    if (!this.active(bar)) {
+    if (!this.has(bar)) {
       throw new Error(
         `Bar index ${bar} is outside range ${this.start}->${this.end}.`,
       );
     }
-
     const index = this.buffer.length - bar + this.end - 1;
     return this.buffer[index];
   }
 
+  /** Array of all values */
+  public get values(): Buffer {
+    return this.buffer;
+  }
+
   /** Printable Ascii Chart */
   public plot(width: number = 78, height: number = 15): string {
-    const header: string = `[ ${this.symbol} - ${this.name}]`;
-    const plot: string = new Chart(this.buffer).plot(width, height - 1);
-    return [header, plot].join("\n");
+    const max = Math.max(
+      ...this.buffer.map((v) =>
+        v.toFixed(2).length
+      ),
+    );
+    const values = downsample(Array.from(this.buffer), width - max - 2);
+    const padding = " ".repeat(max);
+    const chart = plot(values, { height: height - 1, padding });
+    if (this.symbol || this.name) {
+      const header = `[ ${this.symbol ?? ""} - ${this.name ?? ""}]`;
+      return [header, chart].join("\n");
+    }
+    return chart;
   }
 }
 

@@ -40,7 +40,7 @@ export class Exchange {
   /** Instruments available at bar */
   public on(bar: Bar): Instruments {
     if (!this.barInstruments[bar]) {
-      this.barInstruments[bar] = this.instruments.filter((i) => i.active(bar));
+      this.barInstruments[bar] = this.instruments.filter((i) => i.has(bar));
     }
     return this.barInstruments[bar];
   }

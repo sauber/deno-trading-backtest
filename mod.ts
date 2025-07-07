@@ -6,5 +6,4 @@ export * from "./src/position.ts";
 export * from "./src/instrument.ts";
 export * from "./src/portfolio.ts";
 export * from "./src/testinstrument.ts";
-export * from "./src/chart.ts";
 export * from "./src/testdata.ts";

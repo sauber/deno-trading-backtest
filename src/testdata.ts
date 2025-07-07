@@ -10,9 +10,8 @@ CloseOrders,
 } from "./types.ts";
 import { Position, type PositionID, type Positions } from "./position.ts";
 import { Exchange } from "./exchange.ts";
-import type { Instrument, Instruments } from "./instrument.ts";
+import type { Buffer, Instrument, Instruments } from "./instrument.ts";
 import { TestInstrument } from "./testinstrument.ts";
-import type { Buffer } from "./chart.ts";
 
 // Create array from callback
 function repeat<T>(callback: () => T, count: number): Array<T> {

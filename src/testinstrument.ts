@@ -1,8 +1,7 @@
 /** Generate data for testing */
 import { nanoid } from "nanoid";
-import { Instrument } from "./instrument.ts";
+import { Buffer, Instrument } from "./instrument.ts";
 import type { Bar } from "./types.ts";
-import type { Buffer } from "./chart.ts";
 import { makeBuffer } from "./testdata.ts";
 
 /** Generate a random ticker symbol */

@@ -20,7 +20,7 @@ Deno.test("Price", () => {
 
 Deno.test("Active", () => {
   const instr = new Instrument(new Float32Array([0, 1]), 0, "");
-  assertEquals(instr.active(0), true);
-  assertEquals(instr.active(1), true);
-  assertEquals(instr.active(2), false);
+  assertEquals(instr.has(0), true);
+  assertEquals(instr.has(1), true);
+  assertEquals(instr.has(2), false);
 });
