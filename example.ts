@@ -6,7 +6,7 @@ import {
 } from "./mod.ts";
 import { makeExchange, MaybeStrategy } from "./src/testdata.ts";
 
-// Create an Exchange with a numebr instruments available
+// Create an Exchange with a number of instruments available
 const exchange: Exchange = makeExchange(3);
 
 // Create Strategy
@@ -24,5 +24,5 @@ console.log(account.plot(60, 10));
 console.log(
   `Performance. Profit: ${
     (account.profit * 100).toFixed(2)
-  }% Trades: ${account.trades.length} WinRatio: ${account.WinRatio.toFixed(2)}`,
+  }% Trades: ${account.trades.length} WinRatio: ${account.WinRatioTrades.toFixed(2)}`,
 );

@@ -65,7 +65,7 @@ export function makeExchange(count: number): Exchange {
 }
 
 /** Generate a series of numbers for chart */
-export function makeBuffer(count: number): Buffer {
+export function makeSeries(count: number): Buffer {
   const chart: number[] = [];
   let price: Price = 1000 * Math.random();
   for (let i = 0; i < count; i++) {

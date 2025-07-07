@@ -2,7 +2,7 @@
 import { nanoid } from "nanoid";
 import { type Buffer, Instrument } from "./instrument.ts";
 import type { Bar } from "./types.ts";
-import { makeBuffer } from "./testdata.ts";
+import { makeSeries } from "./testdata.ts";
 
 /** Generate a random ticker symbol */
 function makeSymbol(): string {
@@ -70,7 +70,7 @@ Yoshida Young Zac Zag Zebra Zero Zig Zimmer Zip
 export function createTestInstrument(length: number = 730): Instrument {
   const symbol: string = makeSymbol();
   const name: string = makeName(symbol);
-  const series: Buffer = makeBuffer(length);
+  const series: Buffer = makeSeries(length);
   const end: Bar = Math.floor(Math.random() * length / 5);
   return new Instrument(series, end, symbol, name);
 }
