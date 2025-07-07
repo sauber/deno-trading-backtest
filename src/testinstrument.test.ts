@@ -5,14 +5,15 @@ import {
   assertNotEquals,
 } from "@std/assert";
 
-import { TestInstrument } from "./testinstrument.ts";
+import { createTestInstrument } from "./testinstrument.ts";
+import { Instrument } from "./instrument.ts";
 
 Deno.test("Instance", () => {
-  assertInstanceOf(new TestInstrument(), TestInstrument);
+  assertInstanceOf(createTestInstrument(), Instrument);
 });
 
 Deno.test("Properties", () => {
-  const i = new TestInstrument();
+  const i = createTestInstrument();
   assertEquals(i.symbol.length, 4);
   assertGreater(i.name?.length, 0);
   assertEquals(i.start - i.end, i.length - 1);
@@ -20,6 +21,6 @@ Deno.test("Properties", () => {
 });
 
 Deno.test("Print", { ignore: true }, () => {
-  const i = new TestInstrument();
+  const i = createTestInstrument();
   console.log(i.plot());
 });

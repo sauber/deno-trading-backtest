@@ -1,6 +1,6 @@
 /** Generate data for testing */
 import { nanoid } from "nanoid";
-import { Buffer, Instrument } from "./instrument.ts";
+import { type Buffer, Instrument } from "./instrument.ts";
 import type { Bar } from "./types.ts";
 import { makeBuffer } from "./testdata.ts";
 
@@ -64,16 +64,13 @@ Yoshida Young Zac Zag Zebra Zero Zig Zimmer Zip
   return name;
 }
 
-/** An instrument with a random symbol, series and name */
-export class TestInstrument extends Instrument {
-  /**
-   * @param length - Count of bars in series
-   */
-  constructor(length: number = 730) {
-    const symbol: string = makeSymbol();
-    const name: string = makeName(symbol);
-    const series: Buffer = makeBuffer(length);
-    const end: Bar = Math.floor(Math.random() * length / 5);
-    super(series, end, symbol, name);
-  }
+/** An instrument with a random symbol, series and name
+ * @param length - Count of bars in series
+ */
+export function createTestInstrument(length: number = 730): Instrument {
+  const symbol: string = makeSymbol();
+  const name: string = makeName(symbol);
+  const series: Buffer = makeBuffer(length);
+  const end: Bar = Math.floor(Math.random() * length / 5);
+  return new Instrument(series, end, symbol, name);
 }

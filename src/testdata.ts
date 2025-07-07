@@ -11,7 +11,7 @@ CloseOrders,
 import { Position, type PositionID, type Positions } from "./position.ts";
 import { Exchange } from "./exchange.ts";
 import type { Buffer, Instrument, Instruments } from "./instrument.ts";
-import { TestInstrument } from "./testinstrument.ts";
+import { createTestInstrument } from "./testinstrument.ts";
 
 // Create array from callback
 function repeat<T>(callback: () => T, count: number): Array<T> {
@@ -26,19 +26,14 @@ function any<T>(items: Array<T>): Array<T> {
   return [items[index]];
 }
 
-/** Generate an instrument */
-export function makeInstrument(): Instrument {
-  return new TestInstrument(1400);
-}
-
 /** A list of random instruments */
 export function makeInstruments(count: number): Instruments {
-  return repeat(makeInstrument, count);
+  return repeat(()=>createTestInstrument(), count);
 }
 
 // Generate a position
 export function makePosition(amount: number): Position {
-  const instr: Instrument = makeInstrument();
+  const instr: Instrument = createTestInstrument();
   const price = instr.price(instr.start);
   const units = amount / price;
   const id: PositionID = Math.floor(Math.random() * 1024 ** 3);

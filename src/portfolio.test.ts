@@ -6,9 +6,10 @@ import {
 } from "@std/assert";
 import { Portfolio } from "./portfolio.ts";
 import { Position } from "./position.ts";
-import { makeInstrument, makePosition } from "./testdata.ts";
+import { makePosition } from "./testdata.ts";
 import type { Amount, Bar, Price } from "./types.ts";
 import type { Instrument } from "./instrument.ts";
+import { createTestInstrument } from "./testinstrument.ts";
 
 Deno.test("Instance", () => {
   const p = new Portfolio();
@@ -38,7 +39,7 @@ Deno.test("Amount invested", () => {
 Deno.test("Value", () => {
   const portfolio = new Portfolio();
   const amount: Amount = 100;
-  const instrument: Instrument = makeInstrument();
+  const instrument: Instrument = createTestInstrument();
   const date: Bar = instrument.start;
   const price: Price = instrument.price(date);
   const units: number = amount / price;
