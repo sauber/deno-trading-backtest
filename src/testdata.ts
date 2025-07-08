@@ -10,7 +10,7 @@ import type {
 } from "./types.ts";
 import { Position, type PositionID, type Positions } from "./position.ts";
 import { Exchange } from "./exchange.ts";
-import type { Buffer, Instrument, Instruments } from "./instrument.ts";
+import type { Series, Instrument, Instruments } from "./instrument.ts";
 import { createTestInstrument } from "./testinstrument.ts";
 
 // Create array from callback
@@ -65,7 +65,7 @@ export function makeExchange(count: number): Exchange {
 }
 
 /** Generate a series of numbers for chart */
-export function makeSeries(count: number): Buffer {
+export function makeSeries(count: number): Series {
   const chart: number[] = [];
   let price: Price = 1000 * Math.random();
   for (let i = 0; i < count; i++) {
