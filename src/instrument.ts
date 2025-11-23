@@ -47,6 +47,11 @@ export class Instrument {
     return bar >= this.end && bar <= this.start;
   }
 
+  // Convert bar to array index
+  private barToIndex(bar: Bar): number {
+    return this.series.length - bar + this.end - 1;
+  }
+
   /** Look up value at bar index */
   public price(bar: Bar): Price {
     if (!this.has(bar)) {
@@ -54,16 +59,14 @@ export class Instrument {
         `Bar index ${bar} is outside range ${this.start}->${this.end}.`,
       );
     }
-    const index = this.series.length - bar + this.end - 1;
+    const index = this.barToIndex(bar);
     return this.series[index];
   }
 
   /** Printable Ascii Chart */
   public plot(width: number = 78, height: number = 15): string {
     const max = Math.max(
-      ...this.series.map((v) =>
-        v.toFixed(2).length
-      ),
+      ...this.series.map((v) => v.toFixed(2).length),
     );
     const values = downsample(Array.from(this.series), width - max - 2);
     const padding = " ".repeat(max);
@@ -73,6 +76,27 @@ export class Instrument {
       return [header, chart].join("\n");
     }
     return chart;
+  }
+
+  /** A slice of the price series, start and end inclusive */
+  public slice(start: Bar, end: Bar): Instrument {
+    // Confirm data is available
+    if (!this.has(start)) throw new Error(`Start bar ${start} is invalid`);
+    if (!this.has(end)) throw new Error(`End bar ${end} is invalid`);
+
+    // Translate start and end bars to array indeces
+    const start_index: number = this.barToIndex(start);
+    const end_index: number = this.barToIndex(end);
+
+    // Exctract slice from price series
+    const slice: Series = this.series.slice(start_index, end_index + 1);
+
+    // Append range to name
+    const name = this.name + (this.name.length > 0 ? " " : "") +
+      `[${start}:${end}]`;
+
+    // Create modified instrument
+    return new Instrument(slice, end, this.symbol, name);
   }
 }
 
