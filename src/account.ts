@@ -17,6 +17,7 @@ type Order = {
   bar: Bar;
   summary: string;
   amount: Amount;
+  profit?: Amount;
   position: Position;
   price: Price;
   saldo: Saldo;
@@ -223,6 +224,7 @@ export class Account {
       bar,
       summary: reason,
       amount,
+      profit: amount - position.invested,
       position,
       price: amount / position.units,
       saldo: { cash: prev.cash + amount, equity: prev.equity - amount },
@@ -249,33 +251,33 @@ export class Account {
     return sum;
   }
 
+  /** A list of all buy and sell transactions */
+  public get transactions(): Array<
+    Record<string, string | number | undefined>
+  > {
+    const money = (v: number): number => parseFloat(v.toFixed(2));
+    return this.journal.list.filter((t) => t.summary != "Valuation").map((
+      t,
+    ) => ({
+      Bar: t.bar,
+      Action: t.summary,
+      Symbol: ("position" in t) ? t.position.instrument.symbol : "",
+      Price: ("price" in t) ? money(t.price) : "",
+      Amount: ("amount" in t) ? money(t.amount) : "",
+      Profit: ("profit" in t) ? money(t.profit as number) : undefined,
+      Equity: money(t.saldo.equity),
+      Cash: money(t.saldo.cash),
+      Value: money(t.saldo.equity + t.saldo.cash),
+    }));
+  }
+
   /** A printable statement */
   public toString(): string {
-    const money = (v: number): number => parseFloat(v.toFixed(2));
+    const transactions = this.transactions;
     const table = new Table();
     table.title = "Transactions";
-    table.headers = [
-      "Bar",
-      "Action",
-      "Symbol",
-      "Price",
-      "Amount",
-      "Equity",
-      "Cash",
-      "Value",
-    ];
-    table.rows = this.journal.list.filter((t) => t.summary != "Valuation").map((
-      t,
-    ) => [
-      t.bar,
-      t.summary,
-      ("position" in t) ? t.position.instrument.symbol : "",
-      ("price" in t) ? money(t.price) : "",
-      ("amount" in t) ? money(t.amount) : "",
-      money(t.saldo.equity),
-      money(t.saldo.cash),
-      money(t.saldo.equity + t.saldo.cash),
-    ]);
+    table.headers = transactions[0] ? Object.keys(transactions[0]) : [];
+    table.rows = transactions.map((t) => Object.values(t));
     return table.toString();
   }
 

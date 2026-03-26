@@ -9,6 +9,7 @@ import { Exchange } from "./exchange.ts";
 import type { Amount, Bar } from "./types.ts";
 import type { Instrument } from "./instrument.ts";
 import { Position } from "./position.ts";
+import { assert } from "node:console";
 
 const ex: Exchange = new Exchange(makeInstruments(3));
 
@@ -173,6 +174,21 @@ Deno.test("Close Ratio", () => {
   account.remove(pos2, end, "Close");
   const ratio: number = account.closeRatio;
   assertEquals(ratio, 0.5);
+});
+
+Deno.test("List of transactions", () => {
+  const deposit: Amount = 2000;
+  const amount: Amount = 1000;
+  const instrument: Instrument = ex.any();
+  const start: Bar = instrument.start;
+  const end: Bar = instrument.end;
+  const account = new Account(ex, deposit, start + 1);
+  const position = account.add(instrument, amount, start);
+  assertInstanceOf(position, Position);
+  account.remove(position, end, "Close");
+  account.withdraw(deposit, end - 1);
+  assertInstanceOf(account.transactions, Array);
+  assertEquals(account.transactions.length, 4);
 });
 
 Deno.test("Plot Cash and Equity stacked", { ignore: true }, () => {
