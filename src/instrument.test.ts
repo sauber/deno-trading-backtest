@@ -24,3 +24,13 @@ Deno.test("Active", () => {
   assertEquals(instr.has(1), true);
   assertEquals(instr.has(2), false);
 });
+
+Deno.test("Slice", () => {
+  const instr = new Instrument(new Float32Array(Array(10).keys()), 0, "");
+  const slice: Instrument = instr.slice(4, 2);
+  assertEquals(slice.series, new Float32Array([5, 6, 7]));
+  assertEquals(slice.name, "[4:2]");
+  assertEquals(slice.end, 2);
+  assertEquals(slice.start, 4);
+  assertEquals(slice.length, 3);
+});

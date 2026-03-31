@@ -15,15 +15,15 @@ export class Simulation {
   public readonly account: Account;
 
   constructor(
-    private readonly exchange: Exchange,
-    private readonly strategy: Strategy,
+    protected readonly exchange: Exchange,
+    protected readonly strategy: Strategy,
     deposit: number = 10000,
   ) {
     this.account = exchange.createAccount(deposit, exchange.start);
   }
 
   /** Generate a list of close orders for all open positions */
-  private makeCloseOrders(): CloseOrders {
+  protected makeCloseOrders(): CloseOrders {
     return this.account.positions.map((position: Position) => ({
       position,
       confidence: 1,
@@ -32,7 +32,7 @@ export class Simulation {
   }
 
   /** Generate a list of purchase orders for all instruments available at Bar */
-  private makePurchaseOrders(bar: Bar): PurchaseOrders {
+  protected makePurchaseOrders(bar: Bar): PurchaseOrders {
     const instruments: Instruments = this.exchange.on(bar);
     const po: PurchaseOrders = Array<PurchaseOrder>(instruments.length);
     for (let i = 0; i < instruments.length; i++) {
@@ -42,7 +42,7 @@ export class Simulation {
   }
 
   /** Gather data for context */
-  private makeContext(bar: Bar): StrategyContext {
+  protected makeContext(bar: Bar): StrategyContext {
     const context: StrategyContext = {
       amount: this.account.balance,
       value: this.account.value(bar),
@@ -55,7 +55,7 @@ export class Simulation {
   }
 
   /** Buy all positions advised by strategy */
-  private buy(context: StrategyContext): void {
+  protected buy(context: StrategyContext): void {
     const orders: PurchaseOrders = this.strategy.open(context);
     for (const order of orders) {
       this.account.add(order.instrument, order.amount, context.bar);
@@ -63,7 +63,7 @@ export class Simulation {
   }
 
   /** Sell all positions advised by strategy */
-  private sell(context: StrategyContext): void {
+  protected sell(context: StrategyContext): void {
     const orders: CloseOrders = this.strategy.close(context);
     for (const order of orders) {
       this.account.remove(order.position, context.bar, order.reason);
@@ -71,7 +71,7 @@ export class Simulation {
   }
 
   /** Perform one step of simulation */
-  private step(bar: Bar): void {
+  protected step(bar: Bar): void {
     const context: StrategyContext = this.makeContext(bar);
     this.buy(context);
     this.sell(context);
