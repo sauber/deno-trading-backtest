@@ -1,19 +1,20 @@
 import { assertEquals, assertInstanceOf } from "@std/assert";
 import { Simulation } from "./simulation.ts";
-import { makeExchange, MaybeStrategy } from "./testdata.ts";
+import { makeExchange, makeMarket, MaybeStrategy } from "./testdata.ts";
 
-const ex = makeExchange(3);
+const market = makeMarket(3);
+const ex = makeExchange();
 
 Deno.test("Instance", () => {
   assertInstanceOf(
-    new Simulation(ex, new MaybeStrategy()),
+    new Simulation(market, ex, new MaybeStrategy()),
     Simulation,
   );
 });
 
 Deno.test("Run simulation", () => {
-  const s = new Simulation(ex, new MaybeStrategy());
+  const s = new Simulation(market, ex, new MaybeStrategy());
   assertEquals(s.account.bars, 1);
   s.run();
-  assertEquals(s.account.bars, ex.start - ex.end + 1);
+  assertEquals(s.account.bars, market.start - market.end + 1);
 });

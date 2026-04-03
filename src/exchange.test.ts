@@ -1,4 +1,5 @@
 import { Exchange } from "./exchange.ts";
+import { Market } from "./market.ts";
 import { makeInstruments } from "./testdata.ts";
 import {
   assertAlmostEquals,
@@ -14,26 +15,27 @@ import type { Position } from "./position.ts";
 const instruments = makeInstruments(3);
 
 Deno.test("Instance", () => {
-  const ex = new Exchange(instruments);
+  const ex = new Exchange();
   assertInstanceOf(ex, Exchange);
 });
 
 Deno.test("Dates", () => {
-  const ex = new Exchange(instruments);
-  assertGreater(ex.start, ex.end);
+  const market = new Market(instruments);
+  assertGreater(market.start, market.end);
 });
 
 Deno.test("Create Account", () => {
-  const ex = new Exchange(instruments);
+  const ex = new Exchange();
   const ac: Account = ex.createAccount();
   assertInstanceOf(ac, Account);
 });
 
 Deno.test("Buy and selling", () => {
-  const ex = new Exchange(instruments);
+  const market = new Market(instruments);
+  const ex = new Exchange();
 
-  const instr: Instrument = ex.any();
-  const start: Bar = instr.start;
+  const instr: Instrument = market.any();
+  const start: Bar = market.start;
   const amount: Amount = 1000;
   const position: Position = ex.buy(instr, amount, start);
   assertAlmostEquals(position.price * position.units, amount);
@@ -46,9 +48,9 @@ Deno.test("Buy and selling", () => {
 });
 
 Deno.test("Get instrument", () => {
-  const ex = new Exchange(instruments);
-  const any: Instrument = ex.any();
+  const market = new Market(instruments);
+  const any: Instrument = market.any();
   const symbol = any.symbol;
-  const instrument = ex.get(symbol);
+  const instrument = market.get(symbol);
   assertEquals(instrument, any);
 });

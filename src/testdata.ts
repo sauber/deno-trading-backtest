@@ -10,7 +10,8 @@ import type {
 } from "./types.ts";
 import { Position, type PositionID, type Positions } from "./position.ts";
 import { Exchange } from "./exchange.ts";
-import type { Series, Instrument, Instruments } from "./instrument.ts";
+import { Market } from "./market.ts";
+import type { Instrument, Instruments, Series } from "./instrument.ts";
 import { createTestInstrument } from "./testinstrument.ts";
 
 // Create array from callback
@@ -59,9 +60,14 @@ export class MaybeStrategy implements Strategy {
   }
 }
 
-/** Create an exchange with a number of instruments availabel */
-export function makeExchange(count: number): Exchange {
-  return new Exchange(makeInstruments(count));
+/** Create a market with a number of instruments available */
+export function makeMarket(count: number): Market {
+  return new Market(makeInstruments(count));
+}
+
+/** Create an exchange */
+export function makeExchange(_count?: number): Exchange {
+  return new Exchange();
 }
 
 /** Generate a series of numbers for chart */

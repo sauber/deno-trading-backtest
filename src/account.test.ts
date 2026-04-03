@@ -4,14 +4,15 @@ import {
   assertInstanceOf,
 } from "@std/assert";
 import { Account } from "./account.ts";
-import { makeInstruments } from "./testdata.ts";
+import { Market } from "./market.ts";
+import { makeInstruments, makeMarket } from "./testdata.ts";
 import { Exchange } from "./exchange.ts";
 import type { Amount, Bar } from "./types.ts";
 import type { Instrument } from "./instrument.ts";
 import { Position } from "./position.ts";
-import { assert } from "node:console";
 
-const ex: Exchange = new Exchange(makeInstruments(3));
+const market: Market = makeMarket(3);
+const ex: Exchange = new Exchange();
 
 Deno.test("Instance", () => {
   const account = new Account(ex);
@@ -46,7 +47,7 @@ Deno.test("Withdrawals", () => {
 Deno.test("Open", () => {
   const deposit: Amount = 2000;
   const amount: Amount = 100;
-  const instrument: Instrument = ex.any();
+  const instrument: Instrument = market.any();
   const start: Bar = instrument.start;
   const account = new Account(ex, deposit, start);
   const position = account.add(instrument, amount, start);
@@ -57,7 +58,7 @@ Deno.test("Open", () => {
 Deno.test("Open exceeds funds", () => {
   const deposit: Amount = 2000;
   const amount: Amount = 2001;
-  const instrument: Instrument = ex.any();
+  const instrument: Instrument = market.any();
   const start: Bar = instrument.start;
   const account = new Account(ex, deposit, start);
   const position = account.add(instrument, amount, start);
@@ -68,7 +69,7 @@ Deno.test("Open exceeds funds", () => {
 Deno.test("Close", () => {
   const deposit: Amount = 2000;
   const amount: Amount = 100;
-  const instrument: Instrument = ex.any();
+  const instrument: Instrument = market.any();
   const start: Bar = instrument.start;
   const account = new Account(ex, deposit, start);
   const position = account.add(instrument, amount, start);
@@ -179,7 +180,7 @@ Deno.test("Close Ratio", () => {
 Deno.test("List of transactions", () => {
   const deposit: Amount = 2000;
   const amount: Amount = 1000;
-  const instrument: Instrument = ex.any();
+  const instrument: Instrument = market.any();
   const start: Bar = instrument.start;
   const end: Bar = instrument.end;
   const account = new Account(ex, deposit, start + 1);
@@ -191,10 +192,10 @@ Deno.test("List of transactions", () => {
   assertEquals(account.transactions.length, 4);
 });
 
-Deno.test("Plot Cash and Equity stacked", { ignore: true }, () => {
+Deno.test("Plot Cash and Equity stacked", { ignore: false }, () => {
   const deposit: Amount = 2000;
   const amount: Amount = 1000;
-  const instrument: Instrument = ex.any();
+  const instrument: Instrument = market.any();
   const start: Bar = instrument.start;
   const end: Bar = instrument.end;
   const account = new Account(ex, deposit, start + 1);

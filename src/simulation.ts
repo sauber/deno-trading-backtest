@@ -1,4 +1,5 @@
 import type { Account } from "./account.ts";
+import type { Market } from "./market.ts";
 import type { Exchange } from "./exchange.ts";
 import type { Position } from "./position.ts";
 import type { Instruments } from "./instrument.ts";
@@ -15,11 +16,12 @@ export class Simulation {
   public readonly account: Account;
 
   constructor(
+    protected readonly market: Market,
     protected readonly exchange: Exchange,
     protected readonly strategy: Strategy,
     deposit: number = 10000,
   ) {
-    this.account = exchange.createAccount(deposit, exchange.start);
+    this.account = exchange.createAccount(deposit, market.start);
   }
 
   /** Generate a list of close orders for all open positions */
@@ -33,7 +35,7 @@ export class Simulation {
 
   /** Generate a list of purchase orders for all instruments available at Bar */
   protected makePurchaseOrders(bar: Bar): PurchaseOrders {
-    const instruments: Instruments = this.exchange.on(bar);
+    const instruments: Instruments = this.market.on(bar);
     const po: PurchaseOrders = Array<PurchaseOrder>(instruments.length);
     for (let i = 0; i < instruments.length; i++) {
       po[i] = { instrument: instruments[i], amount: 1 };
@@ -79,7 +81,7 @@ export class Simulation {
 
   /** Run steps of simulation from start to end */
   public run(): void {
-    for (let bar = this.exchange.start; bar >= this.exchange.end; --bar) {
+    for (let bar = this.market.start; bar >= this.market.end; --bar) {
       this.step(bar);
     }
   }
