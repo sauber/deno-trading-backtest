@@ -91,7 +91,7 @@ export const makeInstrument = (length: number = 730): Instrument => {
  * @param count - Count of instruments
  * @param length - Count of ticks in each instrument
  */
-export const makeMarket = (count: number = 3, length: number = 730) =>
+export const makeMarket = (count: number = 3, length: number = 730): Market =>
   new Market(
     Array.from(Array(count).keys()).map(() => makeInstrument(length)),
   );
