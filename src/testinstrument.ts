@@ -1,8 +1,8 @@
 /** Generate data for testing */
+import { randn } from "@sauber/statistics";
 import { nanoid } from "nanoid";
-import { type Series, Instrument } from "./instrument.ts";
-import type { Bar } from "./types.ts";
-import { makeSeries } from "./testdata.ts";
+import { Instrument, type Series, type Tick } from "./backtest.ts";
+// import { makeSeries } from "./testdata.ts";
 
 /** Generate a random ticker symbol */
 function makeSymbol(): string {
@@ -64,13 +64,25 @@ Yoshida Young Zac Zag Zebra Zero Zig Zimmer Zip
   return name;
 }
 
+/** Generate a series of numbers for chart */
+function makeSeries(count: number): Series {
+  const chart: number[] = [];
+  let price = 1000 * Math.random();
+  for (let i = 0; i < count; i++) {
+    const change = (randn() - 0.5) / 5; // +/- 2.5%
+    price *= 1 + change;
+    chart.push(parseFloat(price.toFixed(4)));
+  }
+  return new Float32Array(chart);
+}
+
 /** An instrument with a random symbol, series and name
- * @param length - Count of bars in series
+ * @param length - Count of bars in series, default 730
  */
-export function createTestInstrument(length: number = 730): Instrument {
+export function makeInstrument(length: number = 730): Instrument {
   const symbol: string = makeSymbol();
   const name: string = makeName(symbol);
   const series: Series = makeSeries(length);
-  const end: Bar = Math.floor(Math.random() * length / 5);
-  return new Instrument(series, end, symbol, name);
+  const start: Tick = Math.floor(Math.random() * length / 5);
+  return new Instrument(series, start, symbol, name);
 }

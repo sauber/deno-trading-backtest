@@ -16,7 +16,10 @@ export class Instrument {
   public readonly first: number;
 
   /** Last value of series */
-  public readonly larst: number;
+  public readonly last: number;
+
+  /** Count of ticks in series */
+  public readonly length: number;
 
   constructor(
     /** Price series */
@@ -30,7 +33,8 @@ export class Instrument {
   ) {
     this.end = start + series.length - 1;
     this.first = series[0];
-    this.larst = series[series.length - 1];
+    this.last = series[series.length - 1];
+    this.length = series.length;
   }
 
   /** Confirm if data is available at tick */
@@ -57,12 +61,16 @@ export class Market {
   /** Last tick of instruments */
   public readonly end: Tick;
 
+  /** Count if ticks in market */
+  public readonly length: number;
+
   constructor(
     /** List of instruments */
     public readonly instruments: Instrument[],
   ) {
     this.start = Math.min(...instruments.map((i) => i.start));
     this.end = Math.max(...instruments.map((i) => i.end));
+    this.length = this.end - this.start + 1;
   }
 
   /** All instruments available at tick */

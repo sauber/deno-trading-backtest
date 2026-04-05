@@ -12,7 +12,7 @@ import { Position, type PositionID, type Positions } from "./position.ts";
 import { Exchange } from "./exchange.ts";
 import { Market } from "./market.ts";
 import type { Instrument, Instruments, Series } from "./instrument.ts";
-import { createTestInstrument } from "./testinstrument.ts";
+import { makeInstrument } from "./testinstrument.ts";
 
 // Create array from callback
 function repeat<T>(callback: () => T, count: number): Array<T> {
@@ -29,12 +29,12 @@ function any<T>(items: Array<T>): [] | [T] {
 
 /** A list of random instruments */
 export function makeInstruments(count: number): Instruments {
-  return repeat<Instrument>(() => createTestInstrument(), count);
+  return repeat<Instrument>(() => makeInstrument(), count);
 }
 
 // Generate a position
 export function makePosition(amount: number): Position {
-  const instr: Instrument = createTestInstrument();
+  const instr: Instrument = makeInstrument();
   const price = instr.price(instr.start);
   const units = amount / price;
   const id: PositionID = Math.floor(Math.random() * 1024 ** 3);
@@ -68,16 +68,4 @@ export function makeMarket(count: number): Market {
 /** Create an exchange */
 export function makeExchange(_count?: number): Exchange {
   return new Exchange();
-}
-
-/** Generate a series of numbers for chart */
-export function makeSeries(count: number): Series {
-  const chart: number[] = [];
-  let price: Price = 1000 * Math.random();
-  for (let i = 0; i < count; i++) {
-    const change = (randn() - 0.5) / 5; // +/- 2.5%
-    price *= 1 + change;
-    chart.push(parseFloat(price.toFixed(4)));
-  }
-  return new Float32Array(chart);
 }

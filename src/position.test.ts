@@ -2,9 +2,9 @@ import { assertEquals, assertInstanceOf, assertNotEquals } from "@std/assert";
 import { Position, type PositionID } from "./position.ts";
 import type { Amount, Bar, Price } from "./types.ts";
 import type { Instrument } from "./instrument.ts";
-import { createTestInstrument } from "./testinstrument.ts";
+import { makeInstrument } from "./testinstrument.ts";
 
-const instr: Instrument = createTestInstrument();
+const instr: Instrument = makeInstrument();
 
 Deno.test("Instance", () => {
   const p = new Position(instr, 0, 0, 0, 0, 0);
