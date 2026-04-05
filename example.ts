@@ -1,32 +1,35 @@
-import {
-  type Account,
-  type Exchange,
-  type Market,
-  Simulation,
-  type Strategy,
-} from "./mod.ts";
-import { makeExchange, makeMarket, MaybeStrategy } from "./src/testdata.ts";
+// Backtest a rebalancing strategy
 
-// Create Market and Exchange
-const market: Market = makeMarket(3);
-const exchange: Exchange = makeExchange();
+import { testMarket } from "./src/backtest.test.ts";
+import { Backtest } from "./src/backtest.ts";
+import { rebalance } from "./src/strategies.ts";
+import { linechart } from "jsr:@sauber/widgets";
+import { Table } from "jsr:@sauber/table";
 
-// Create Strategy
-const strategy: Strategy = new MaybeStrategy(0.05);
-
-// Run Simulation
-const simulation = new Simulation(market, exchange, strategy);
-simulation.run();
-const account: Account = simulation.account;
-
-// Print list of transaction, positions and performance stats
-console.log(account.toString());
-console.log(account.portfolio.toString(market.end));
-console.log(account.plot(60, 10));
-console.log(
-  `Performance. Profit: ${
-    (account.profit * 100).toFixed(2)
-  }% Trades: ${account.trades.length} WinRatio: ${
-    account.WinRatioTrades.toFixed(2)
-  }`,
+const market = testMarket(9, 100);
+const targets = Object.fromEntries(
+  market.instruments.map((i) => [i.symbol, 10]),
 );
+const strategy = rebalance(targets);
+
+// Run simulation
+const simulation = new Backtest(market, strategy, 1000, 0, 0);
+simulation.run();
+
+// Display value of investment
+const value = Array.from(simulation.value);
+console.log("Investment Value");
+console.log(linechart(value, 15, 72));
+
+// Display open positions
+const table = new Table();
+table.headers = ["Symbol", "Open", "Amount"];
+table.rows = simulation.positions.map((
+  p,
+) => [
+  p.instrument.symbol,
+  p.start,
+  (p.quantity * p.instrument.price(market.end)).toFixed(2),
+]);
+table.title = "Open Positions";
+console.log(table.toString());
