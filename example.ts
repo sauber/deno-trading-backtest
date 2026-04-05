@@ -1,12 +1,12 @@
 // Backtest a rebalancing strategy
 
-import { testMarket } from "./src/backtest.test.ts";
+import { makeMarket } from "./src/testinstrument.ts";
 import { Backtest } from "./src/backtest.ts";
 import { rebalance } from "./src/strategies.ts";
 import { linechart } from "jsr:@sauber/widgets";
 import { Table } from "jsr:@sauber/table";
 
-const market = testMarket(9, 100);
+const market = makeMarket(9, 100);
 const targets = Object.fromEntries(
   market.instruments.map((i) => [i.symbol, 10]),
 );

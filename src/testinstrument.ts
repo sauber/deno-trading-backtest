@@ -1,7 +1,7 @@
 /** Generate data for testing */
 import { randn } from "@sauber/statistics";
 import { nanoid } from "nanoid";
-import { Instrument, type Series, type Tick } from "./backtest.ts";
+import { Instrument, Market, type Series, type Tick } from "./backtest.ts";
 // import { makeSeries } from "./testdata.ts";
 
 /** Generate a random ticker symbol */
@@ -79,10 +79,19 @@ function makeSeries(count: number): Series {
 /** An instrument with a random symbol, series and name
  * @param length - Count of bars in series, default 730
  */
-export function makeInstrument(length: number = 730): Instrument {
+export const makeInstrument = (length: number = 730): Instrument => {
   const symbol: string = makeSymbol();
   const name: string = makeName(symbol);
   const series: Series = makeSeries(length);
   const start: Tick = Math.floor(Math.random() * length / 5);
   return new Instrument(series, start, symbol, name);
-}
+};
+
+/** Create a market with a number of instrument
+ * @param count - Count of instruments
+ * @param length - Count of ticks in each instrument
+ */
+export const makeMarket = (count: number = 3, length: number = 730) =>
+  new Market(
+    Array.from(Array(count).keys()).map(() => makeInstrument(length)),
+  );

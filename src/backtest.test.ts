@@ -5,24 +5,19 @@ import {
   assertInstanceOf,
   assertNotEquals,
 } from "@std/assert";
-import { type Amount, Backtest, Market } from "./backtest.ts";
-import { makeInstrument } from "./testinstrument.ts";
+import { type Amount, Backtest } from "./backtest.ts";
+import { makeMarket } from "./testinstrument.ts";
 import { doNothing, randomTrading } from "./strategies.ts";
 
-export const testMarket = (count: number = 3, length: number = 730) =>
-  new Market(
-    Array.from(Array(count).keys()).map(() => makeInstrument(length)),
-  );
-
 Deno.test("Instance", () => {
-  const market = testMarket();
+  const market = makeMarket();
   const simulation = new Backtest(market, doNothing, 10000, 0.001, 0.001);
   assertInstanceOf(simulation, Backtest);
 });
 
 Deno.test("Run simulation", () => {
   const amount: Amount = 10000;
-  const market = testMarket();
+  const market = makeMarket();
   const offset = market.start;
   const simulation = new Backtest(market, doNothing, amount, 0.001, 0.001);
   simulation.run();
@@ -37,7 +32,7 @@ Deno.test("Run simulation", () => {
 
 Deno.test("Random strategy", () => {
   const amount: Amount = 10000;
-  const market = testMarket();
+  const market = makeMarket();
   const simulation = new Backtest(market, randomTrading, amount, 0.001, 0.001);
   simulation.run();
   assertNotEquals(simulation.value[simulation.value.length - 1], amount);
