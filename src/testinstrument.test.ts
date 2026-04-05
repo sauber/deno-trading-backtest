@@ -4,7 +4,6 @@ import {
   assertInstanceOf,
   assertNotEquals,
 } from "@std/assert";
-
 import { makeInstrument } from "./testinstrument.ts";
 import { Instrument } from "./backtest.ts";
 

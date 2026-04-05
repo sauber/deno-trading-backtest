@@ -5,7 +5,7 @@ import {
   assertInstanceOf,
   assertNotEquals,
 } from "@std/assert";
-import { type Amount, Backtest, type Instrument } from "./backtest.ts";
+import { type Amount, Backtest } from "./backtest.ts";
 import { makeMarket } from "./testinstrument.ts";
 import { doNothing, randomTrading } from "./strategies.ts";
 
