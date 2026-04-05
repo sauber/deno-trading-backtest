@@ -1,7 +1,7 @@
 import type {
   Amount,
   BuyOrder,
-  Market,
+  Instrument,
   OpenPosition,
   Order,
   Portfolio,
@@ -32,7 +32,7 @@ export function rebalance(targets: Record<string, number>): Strategy {
   return (
     tick: Tick,
     cash: Amount,
-    market: Market,
+    instruments: Instrument[],
     portfolio: Portfolio,
   ) => {
     const orders: Order[] = [];
@@ -47,7 +47,7 @@ export function rebalance(targets: Record<string, number>): Strategy {
 
       // Buy additional positions
       if (pct_invested < (target - 1)) {
-        const instrument = market.instruments.find((i) => i.symbol === symbol);
+        const instrument = instruments.find((i) => i.symbol === symbol);
         if (instrument) {
           const count = Math.floor(target - invested / total_value * 100);
           const amount = total_value / 100;
@@ -78,7 +78,7 @@ export const doNothing: Strategy = () => [];
 export const randomTrading: Strategy = (
   tick: Tick,
   cash: Amount,
-  market: Market,
+  instruments: Instrument[],
   portfolio: Portfolio,
 ) => {
   const orders: Order[] = [];
@@ -94,8 +94,8 @@ export const randomTrading: Strategy = (
 
   // 20% chance of opening a position
   if (Math.random() < 0.2) {
-    const instrument =
-      market.instruments[Math.floor(Math.random() * market.instruments.length)];
+    const index = Math.floor(Math.random() * instruments.length);
+    const instrument = instruments[index];
     // Value of portfolio
     const equity: Amount = portfolio.map((p: OpenPosition) =>
       p.quantity * p.instrument.price(tick)

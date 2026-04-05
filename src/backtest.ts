@@ -64,18 +64,37 @@ export class Market {
   /** Count if ticks in market */
   public readonly length: number;
 
-  constructor(
-    /** List of instruments */
-    public readonly instruments: Instrument[],
-  ) {
-    this.start = Math.min(...instruments.map((i) => i.start));
-    this.end = Math.max(...instruments.map((i) => i.end));
+  /** Cache of available instruments per tick */
+  private readonly _cache: Instrument[][];
+
+  constructor(public readonly instruments: Instrument[]) {
+    // Optimized min/max calculation to avoid large temporary arrays and spread operator overhead
+    let min = instruments.length > 0 ? instruments[0].start : 0;
+    let max = instruments.length > 0 ? instruments[0].end : 0;
+    for (let i = 1; i < instruments.length; i++) {
+      const inst = instruments[i];
+      if (inst.start < min) min = inst.start;
+      if (inst.end > max) max = inst.end;
+    }
+
+    this.start = min;
+    this.end = max;
     this.length = this.end - this.start + 1;
+
+    // Pre-calculate available instruments for every simulation tick
+    this._cache = new Array(this.end + 1);
+    for (let t = this.start; t <= this.end; t++) {
+      const available: Instrument[] = [];
+      for (let i = 0; i < instruments.length; i++) {
+        if (instruments[i].has(t)) available.push(instruments[i]);
+      }
+      this._cache[t] = available;
+    }
   }
 
   /** All instruments available at tick */
-  public on(tick: Tick): Market {
-    return new Market(this.instruments.filter((i) => i.has(tick)));
+  public on(tick: Tick): Instrument[] {
+    return this._cache[tick] || [];
   }
 }
 
@@ -128,7 +147,7 @@ export type Strategy = (
   /** Amount of available cash */
   cash: Amount,
   /** Available instruments at tick */
-  market: Market,
+  instruments: Instrument[],
   /** Current open positions */
   portfolio: Portfolio,
 ) => Array<Order>;
@@ -208,20 +227,21 @@ export class Backtest {
 
   /** Close positions where price data is no longer available */
   private liquidation(): void {
-    for (
-      const position of this.positions.filter((p) =>
-        p.instrument.end < this.tick
-      )
-    ) this.expire(position);
+    // Iterating backwards to safely handle removal during loop without .filter allocation
+    for (let i = this.positions.length - 1; i >= 0; i--) {
+      if (this.positions[i].instrument.end < this.tick) {
+        this.expire(this.positions[i]);
+      }
+    }
   }
 
   /** Process orders from strategy */
   private trade(): void {
-    const instruments: Market = this.market.on(this.tick);
+    const available = this.market.on(this.tick);
     const orders: Array<Order> = this.strategy(
       this.tick,
       this.saldo,
-      instruments,
+      available,
       this.positions,
     );
     for (const order of orders) {
