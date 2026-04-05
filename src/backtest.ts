@@ -12,6 +12,12 @@ export class Instrument {
   /** Last tick of series */
   public readonly end: Tick;
 
+  /** First value of series */
+  public readonly first: number;
+
+  /** Last value of series */
+  public readonly larst: number;
+
   constructor(
     /** Price series */
     public readonly series: Series,
@@ -23,11 +29,18 @@ export class Instrument {
     public readonly name?: string,
   ) {
     this.end = start + series.length - 1;
+    this.first = series[0];
+    this.larst = series[series.length - 1];
+  }
+
+  /** Confirm if data is available at tick */
+  public has(tick: Tick): boolean {
+    return tick >= this.start && tick <= this.end;
   }
 
   /** Price at tick */
   public price(tick: Tick): number {
-    if (tick < this.start || tick > this.end) {
+    if (!this.has(tick)) {
       throw new Error(
         `Error: Price requested for instrument ${this.symbol} at tick ${tick} is outside range [${this.start};${this.end}].`,
       );
@@ -54,9 +67,7 @@ export class Market {
 
   /** All instruments available at tick */
   public on(tick: Tick): Market {
-    return new Market(
-      this.instruments.filter((i) => i.start <= tick && i.end >= tick),
-    );
+    return new Market(this.instruments.filter((i) => i.has(tick)));
   }
 }
 
