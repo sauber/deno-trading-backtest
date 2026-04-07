@@ -75,40 +75,45 @@ export function rebalance(targets: Record<string, number>): Strategy {
 
 export const doNothing: Strategy = () => [];
 
-export const randomTrading: Strategy = (
-  tick: Tick,
-  cash: Amount,
-  instruments: Instrument[],
-  portfolio: Portfolio,
-) => {
-  const orders: Order[] = [];
+export function randomTrading(
+  chance: number = 0.2,
+  ratio: number = 0.1,
+): Strategy {
+  return (
+    tick: Tick,
+    cash: Amount,
+    instruments: Instrument[],
+    portfolio: Portfolio,
+  ) => {
+    const orders: Order[] = [];
 
-  // 20% chance of closing a position
-  if (portfolio.length > 0 && Math.random() < 0.2) {
-    const position = portfolio[Math.floor(Math.random() * portfolio.length)];
-    orders.push({
-      position,
-      reason: "Close",
-    } as SellOrder);
-  }
+    // 20% chance of closing a position
+    if (portfolio.length > 0 && Math.random() < chance) {
+      const position = portfolio[Math.floor(Math.random() * portfolio.length)];
+      orders.push({
+        position,
+        reason: "Close",
+      } as SellOrder);
+    }
 
-  // 20% chance of opening a position
-  if (Math.random() < 0.2) {
-    const index = Math.floor(Math.random() * instruments.length);
-    const instrument = instruments[index];
-    // Value of portfolio
-    const equity: Amount = portfolio.map((p: OpenPosition) =>
-      p.quantity * p.instrument.price(tick)
-    ).reduce((a, b) => a + b, 0);
+    // 20% chance of opening a position
+    if (Math.random() < chance) {
+      const index = Math.floor(Math.random() * instruments.length);
+      const instrument = instruments[index];
+      // Value of portfolio
+      const equity: Amount = portfolio.map((p: OpenPosition) =>
+        p.quantity * p.instrument.price(tick)
+      ).reduce((a, b) => a + b, 0);
 
-    const total = equity + cash;
-    // Spend 10% of total value in each new position
-    const amount = total / 10;
-    orders.push({
-      instrument,
-      amount,
-    } as BuyOrder);
-  }
+      const total = equity + cash;
+      // Spend 10% of total value in each new position
+      const amount = total * ratio;
+      orders.push({
+        instrument,
+        amount,
+      } as BuyOrder);
+    }
 
-  return orders;
-};
+    return orders;
+  };
+}

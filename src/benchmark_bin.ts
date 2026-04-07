@@ -6,7 +6,7 @@ import { makeMarket } from "./testinstrument.ts";
 const market: Market = makeMarket(500);
 
 // Create Strategy
-const strategy: Strategy = randomTrading;
+const strategy: Strategy = randomTrading(0.2, 0.1);
 
 // Run Simulation many times
 for (let i = 0; i < 1000; i++) {

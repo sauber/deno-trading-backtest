@@ -33,7 +33,13 @@ Deno.test("Run simulation", () => {
 Deno.test("Random strategy", () => {
   const amount: Amount = 10000;
   const market = makeMarket();
-  const simulation = new Backtest(market, randomTrading, amount, 0.001, 0.001);
+  const simulation = new Backtest(
+    market,
+    randomTrading(0.2, 0.1),
+    amount,
+    0.001,
+    0.001,
+  );
   simulation.run();
   assertNotEquals(simulation.value[simulation.value.length - 1], amount);
   assertGreaterOrEqual(simulation.positions.length, 0);
