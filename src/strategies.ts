@@ -1,7 +1,7 @@
 // A collection of sample strategies
 
 import type { Instrument } from "./instrument.ts";
-import type { Amount, Portfolio } from "./position.ts";
+import type { Amount, OpenPosition, Portfolio } from "./position.ts";
 import type { Tick } from "./series.ts";
 import type { BuyOrder, Order, SellOrder, Strategy } from "./strategy.ts";
 
@@ -30,7 +30,10 @@ export function rebalance(targets: Record<string, number>): Strategy {
         p.instrument.symbol === symbol
       );
       // Total amount invested in target
-      const invested: Amount = portfolio.value(tick);
+      const invested: Amount = positions.map((p) => p.invested).reduce(
+        (a, b) => a + b,
+        0,
+      );
       let pct_invested = invested / total_value * 100;
 
       // Buy additional positions
@@ -49,7 +52,7 @@ export function rebalance(targets: Record<string, number>): Strategy {
       // Sell excessive positions
       let index = 0;
       while (pct_invested > target + 1) {
-        const position = positions[index];
+        const position: OpenPosition = positions[index];
         orders.push({ position, reason: "Close" } as SellOrder);
         index++;
         pct_invested -= position.value(tick) / total_value * 100;
@@ -76,9 +79,8 @@ export function randomTrading(
 
     // 20% chance of closing a position
     if (portfolio.positions.length > 0 && Math.random() < chance) {
-      const position =
-        portfolio
-          .positions[Math.floor(Math.random() * portfolio.positions.length)];
+      const position = portfolio
+        .positions[Math.floor(Math.random() * portfolio.positions.length)];
       orders.push({
         position,
         reason: "Close",

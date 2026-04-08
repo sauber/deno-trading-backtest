@@ -8,9 +8,9 @@ export type Amount = number;
 export class OpenPosition {
   constructor(
     public readonly instrument: Instrument,
-    public readonly quantity: number,
     public readonly start: Tick,
     public readonly invested: Amount,
+    public readonly quantity: number,
   ) {}
 
   /** Value of position at tick */
@@ -26,9 +26,9 @@ export class OpenPosition {
   ): ClosedPosition {
     return new ClosedPosition(
       this.instrument,
-      this.quantity,
       this.start,
       this.invested,
+      this.quantity,
       tick,
       reason,
       profit,
@@ -50,9 +50,9 @@ export type ClosingReason =
 export class ClosedPosition {
   constructor(
     public readonly instrument: Instrument,
-    public readonly quantity: number,
     public readonly start: Tick,
     public readonly invested: Amount,
+    public readonly quantity: number,
     public readonly end: Tick,
     public readonly reason: ClosingReason,
     public readonly profit: Amount,

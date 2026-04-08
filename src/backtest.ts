@@ -57,9 +57,9 @@ export class Backtest {
       (1 - this.buy_commission);
     const position = new OpenPosition(
       order.instrument,
-      quantity,
       this.tick,
       order.amount,
+      quantity,
     );
     this.portfolio.add(position);
     this.saldo -= order.amount;
