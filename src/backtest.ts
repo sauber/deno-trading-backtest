@@ -107,7 +107,14 @@ export type OpenPosition = {
 };
 
 /** Reason for closing position */
-export type ClosingReason = "Close" | "Expire" | "Loss" | "Profit" | "Take";
+export type ClosingReason =
+  | "Close"
+  | "Expire"
+  | "Loss"
+  | "Profit"
+  | "Take"
+  | "Stop"
+  | "Trail";
 
 /** Position no longer open */
 export type ClosedPosition = OpenPosition & {
