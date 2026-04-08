@@ -1,11 +1,9 @@
 import type { Market } from "./market.ts";
-import type {
-  Amount,
-  ClosedPosition,
-  ClosingReason,
+import {
+  type Amount,
   OpenPosition,
-  Portfolio,
-  Position,
+  type Portfolio,
+  type Position,
 } from "./position.ts";
 import type { Series, Tick } from "./series.ts";
 import type { BuyOrder, Order, SellOrder, Strategy } from "./strategy.ts";
@@ -55,40 +53,37 @@ export class Backtest {
   /** Open new position */
   private open(order: BuyOrder): void {
     if (order.amount > this.saldo) return;
-    const position: OpenPosition = {
-      instrument: order.instrument,
-      quantity: order.amount / order.instrument.price(this.tick) *
-        (1 - this.buy_commission),
-      start: this.tick,
-      invested: order.amount,
-    };
+    const quantity = order.amount / order.instrument.price(this.tick) *
+      (1 - this.buy_commission);
+    const position = new OpenPosition(
+      order.instrument,
+      quantity,
+      this.tick,
+      order.amount,
+    );
     this.positions.push(position);
     this.saldo -= order.amount;
   }
 
   /** Close existing position */
-  private close(order: SellOrder, price: Amount): void {
-    const value: Amount = order.position.quantity * price;
+  private close(order: SellOrder, tick: Tick): void {
+    const value: Amount = order.position.value(tick);
     const amount: Amount = value * (1 - this.sell_commission);
     const profit = amount - order.position.invested;
     this.positions.splice(this.positions.indexOf(order.position), 1);
-    const end: Tick = this.tick;
-    const position: OpenPosition = order.position;
-    const reason: ClosingReason = order.reason;
-    const closed: ClosedPosition = { ...position, reason, end, profit };
+    const closed = order.position.close(this.tick, order.reason, profit);
     this.transactions.push(closed);
     this.saldo += amount;
   }
 
   /** Expire position */
   private expire(position: Position): void {
-    const price: Amount = position.instrument.price(this.tick - 1);
-    this.close({ position, reason: "Expire" }, price);
+    this.close({ position, reason: "Expire" }, this.tick - 1);
   }
 
   /** Close positions where price data is no longer available */
   private liquidation(): void {
-    // Iterating backwards to safely handle removal during loop without .filter allocation
+    // Iterating backwards to safely handle removal during loop
     for (let i = this.positions.length - 1; i >= 0; i--) {
       if (this.positions[i].instrument.end < this.tick) {
         this.expire(this.positions[i]);
@@ -107,7 +102,7 @@ export class Backtest {
     );
     for (const order of orders) {
       if ("instrument" in order) this.open(order);
-      else this.close(order, order.position.instrument.price(this.tick));
+      else this.close(order, this.tick);
     }
   }
 
@@ -115,10 +110,10 @@ export class Backtest {
   private valuation(): void {
     const index = this.tick - this.market.start;
     this.cash[index] = this.saldo;
-    this.invested[index] = this.positions.map((p) =>
-      p.quantity *
-      p.instrument.price(this.tick)
-    ).reduce((a, b) => a + b, 0);
+    this.invested[index] = this.positions.map((p) => p.value(this.tick)).reduce(
+      (a, b) => a + b,
+      0,
+    );
     this.value[index] = this.cash[index] + this.invested[index];
   }
 

@@ -23,13 +23,13 @@ console.log(linechart(value, 15, 72));
 
 // Display open positions
 const table = new Table();
-table.headers = ["Symbol", "Open", "Amount"];
+table.headers = ["Symbol", "Open", "Value"];
 table.rows = simulation.positions.map((
   p,
 ) => [
   p.instrument.symbol,
   p.start,
-  (p.quantity * p.instrument.price(market.end)).toFixed(2),
+  (p.value(market.end)).toFixed(2),
 ]);
 table.title = "Open Positions";
 console.log(table.toString());

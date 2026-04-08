@@ -7,12 +7,35 @@ export type Amount = number;
 /** Instruments available for trading */
 
 /** Position opened  */
-export type OpenPosition = {
-  instrument: Instrument;
-  quantity: number;
-  start: Tick;
-  invested: Amount;
-};
+export class OpenPosition {
+  constructor(
+    public readonly instrument: Instrument,
+    public readonly quantity: number,
+    public readonly start: Tick,
+    public readonly invested: Amount,
+  ) {}
+
+  public value(tick: Tick): Amount {
+    return this.quantity * this.instrument.price(tick);
+  }
+
+  /** Close position */
+  public close(
+    tick: Tick,
+    reason: ClosingReason,
+    profit: Amount,
+  ): ClosedPosition {
+    return new ClosedPosition(
+      this.instrument,
+      this.quantity,
+      this.start,
+      this.invested,
+      tick,
+      reason,
+      profit,
+    );
+  }
+}
 
 /** Reason for closing position */
 export type ClosingReason =
@@ -25,11 +48,19 @@ export type ClosingReason =
   | "Trail";
 
 /** Position no longer open */
-export type ClosedPosition = OpenPosition & {
-  reason: ClosingReason;
-  end: Tick;
-  profit: Amount;
-};
+export class ClosedPosition extends OpenPosition {
+  constructor(
+    instrument: Instrument,
+    quantity: number,
+    start: Tick,
+    invested: Amount,
+    public readonly end: Tick,
+    public readonly reason: ClosingReason,
+    public readonly profit: Amount,
+  ) {
+    super(instrument, quantity, start, invested);
+  }
+}
 
 /** Open or closed Position */
 export type Position = OpenPosition | ClosedPosition;

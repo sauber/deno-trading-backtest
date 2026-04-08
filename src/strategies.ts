@@ -7,10 +7,7 @@ import type { BuyOrder, Order, SellOrder, Strategy } from "./strategy.ts";
 
 // Calculate sum of value of positions
 const value = (positions: Portfolio, tick: Tick): number =>
-  positions.map((p) => p.quantity * p.instrument.price(tick)).reduce(
-    (a, b) => a + b,
-    0,
-  );
+  positions.map((p) => p.value(tick)).reduce((a, b) => a + b, 0);
 
 /** A strategy to rebalance positions in instrument to target percentages of total value.
  * For example { Gold: 40, Silver: 40 }
@@ -57,8 +54,7 @@ export function rebalance(targets: Record<string, number>): Strategy {
         const position = positions[index];
         orders.push({ position, reason: "Close" } as SellOrder);
         index++;
-        pct_invested -= position.quantity * position.instrument.price(tick) /
-          total_value * 100;
+        pct_invested -= position.value(tick) / total_value * 100;
       }
     });
 
@@ -94,9 +90,8 @@ export function randomTrading(
       const index = Math.floor(Math.random() * instruments.length);
       const instrument = instruments[index];
       // Value of portfolio
-      const equity: Amount = portfolio.map((p: OpenPosition) =>
-        p.quantity * p.instrument.price(tick)
-      ).reduce((a, b) => a + b, 0);
+      const equity: Amount = portfolio.map((p: OpenPosition) => p.value(tick))
+        .reduce((a, b) => a + b, 0);
 
       const total = equity + cash;
       // Spend 10% of total value in each new position
