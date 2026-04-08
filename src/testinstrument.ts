@@ -2,7 +2,9 @@
 
 import { randn } from "@sauber/statistics";
 import { nanoid } from "nanoid";
-import { Instrument, Market, type Series, type Tick } from "./backtest.ts";
+import type { Series, Tick } from "./series.ts";
+import { Instrument } from "./instrument.ts";
+import { Market } from "./market.ts";
 
 /** Generate a random ticker symbol */
 function makeSymbol(): string {

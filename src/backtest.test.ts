@@ -5,9 +5,10 @@ import {
   assertInstanceOf,
   assertNotEquals,
 } from "@std/assert";
-import { type Amount, Backtest } from "./backtest.ts";
+import { Backtest } from "./backtest.ts";
 import { makeMarket } from "./testinstrument.ts";
 import { doNothing, randomTrading } from "./strategies.ts";
+import type { Amount } from "./position.ts";
 
 Deno.test("Instance", () => {
   const market = makeMarket();

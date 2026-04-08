@@ -1,16 +1,9 @@
-import type {
-  Amount,
-  BuyOrder,
-  Instrument,
-  OpenPosition,
-  Order,
-  Portfolio,
-  SellOrder,
-  Strategy,
-  Tick,
-} from "./backtest.ts";
-
 // A collection of sample strategies
+
+import type { Instrument } from "./instrument.ts";
+import type { Amount, OpenPosition, Portfolio } from "./position.ts";
+import type { Tick } from "./series.ts";
+import type { BuyOrder, Order, SellOrder, Strategy } from "./strategy.ts";
 
 // Calculate sum of value of positions
 const value = (positions: Portfolio, tick: Tick): number =>

@@ -5,7 +5,7 @@ import {
   assertNotEquals,
 } from "@std/assert";
 import { makeInstrument } from "./testinstrument.ts";
-import { Instrument } from "./backtest.ts";
+import { Instrument } from "./instrument.ts";
 
 Deno.test("Instance", () => {
   assertInstanceOf(makeInstrument(), Instrument);

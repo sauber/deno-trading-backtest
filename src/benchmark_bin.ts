@@ -1,5 +1,7 @@
-import { Backtest, type Market, type Strategy } from "./backtest.ts";
+import { Backtest } from "./backtest.ts";
+import type { Market } from "./market.ts";
 import { randomTrading } from "./strategies.ts";
+import type { Strategy } from "./strategy.ts";
 import { makeMarket } from "./testinstrument.ts";
 
 // Create Market and Exchange
