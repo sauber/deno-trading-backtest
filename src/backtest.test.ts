@@ -43,6 +43,6 @@ Deno.test("Random strategy", () => {
   );
   simulation.run();
   assertNotEquals(simulation.value[simulation.value.length - 1], amount);
-  assertGreaterOrEqual(simulation.positions.length, 0);
+  assertGreaterOrEqual(simulation.portfolio.positions.length, 0);
   assertGreater(simulation.transactions.length, 0);
 });

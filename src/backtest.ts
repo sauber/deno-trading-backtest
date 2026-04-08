@@ -2,7 +2,7 @@ import type { Market } from "./market.ts";
 import {
   type Amount,
   OpenPosition,
-  type Portfolio,
+  Portfolio,
   type Position,
 } from "./position.ts";
 import type { Series, Tick } from "./series.ts";
@@ -23,7 +23,7 @@ export class Backtest {
   public readonly value: Series;
 
   /** Open Positions */
-  public readonly positions: Portfolio = [];
+  public readonly portfolio: Portfolio = new Portfolio();
 
   /** History of transactions */
   public readonly transactions: Transactions = [];
@@ -61,7 +61,7 @@ export class Backtest {
       this.tick,
       order.amount,
     );
-    this.positions.push(position);
+    this.portfolio.add(position);
     this.saldo -= order.amount;
   }
 
@@ -70,24 +70,24 @@ export class Backtest {
     const value: Amount = order.position.value(tick);
     const amount: Amount = value * (1 - this.sell_commission);
     const profit = amount - order.position.invested;
-    this.positions.splice(this.positions.indexOf(order.position), 1);
+    this.portfolio.remove(order.position);
     const closed = order.position.close(this.tick, order.reason, profit);
     this.transactions.push(closed);
     this.saldo += amount;
   }
 
   /** Expire position */
-  private expire(position: Position): void {
+  private expire(position: OpenPosition): void {
     this.close({ position, reason: "Expire" }, this.tick - 1);
   }
 
   /** Close positions where price data is no longer available */
   private liquidation(): void {
+    const positions = this.portfolio.positions;
     // Iterating backwards to safely handle removal during loop
-    for (let i = this.positions.length - 1; i >= 0; i--) {
-      if (this.positions[i].instrument.end < this.tick) {
-        this.expire(this.positions[i]);
-      }
+    for (let i = positions.length - 1; i >= 0; i--) {
+      const position = positions[i];
+      if (position.instrument.end < this.tick) this.expire(position);
     }
   }
 
@@ -98,7 +98,7 @@ export class Backtest {
       this.tick,
       this.saldo,
       available,
-      this.positions,
+      this.portfolio,
     );
     for (const order of orders) {
       if ("instrument" in order) this.open(order);
@@ -110,10 +110,7 @@ export class Backtest {
   private valuation(): void {
     const index = this.tick - this.market.start;
     this.cash[index] = this.saldo;
-    this.invested[index] = this.positions.map((p) => p.value(this.tick)).reduce(
-      (a, b) => a + b,
-      0,
-    );
+    this.invested[index] = this.portfolio.value(this.tick);
     this.value[index] = this.cash[index] + this.invested[index];
   }
 

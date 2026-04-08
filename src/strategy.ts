@@ -1,5 +1,10 @@
 import type { Instrument } from "./instrument.ts";
-import type { Amount, ClosingReason, Portfolio, Position } from "./position.ts";
+import type {
+  Amount,
+  ClosingReason,
+  OpenPosition,
+  Portfolio,
+} from "./position.ts";
 import type { Tick } from "./series.ts";
 
 /** Order to buy Position in Instrument */
@@ -10,7 +15,7 @@ export type BuyOrder = {
 
 /** Order to sell Position */
 export type SellOrder = {
-  position: Position;
+  position: OpenPosition;
   reason: ClosingReason;
 };
 

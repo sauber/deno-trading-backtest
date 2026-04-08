@@ -1,13 +1,9 @@
 // A collection of sample strategies
 
 import type { Instrument } from "./instrument.ts";
-import type { Amount, OpenPosition, Portfolio } from "./position.ts";
+import type { Amount, Portfolio } from "./position.ts";
 import type { Tick } from "./series.ts";
 import type { BuyOrder, Order, SellOrder, Strategy } from "./strategy.ts";
-
-// Calculate sum of value of positions
-const value = (positions: Portfolio, tick: Tick): number =>
-  positions.map((p) => p.value(tick)).reduce((a, b) => a + b, 0);
 
 /** A strategy to rebalance positions in instrument to target percentages of total value.
  * For example { Gold: 40, Silver: 40 }
@@ -27,12 +23,14 @@ export function rebalance(targets: Record<string, number>): Strategy {
   ) => {
     const orders: Order[] = [];
     // Total value of account
-    const total_value = cash + value(portfolio, tick);
+    const total_value = cash + portfolio.value(tick);
 
     Object.entries(targets).forEach(([symbol, target]) => {
-      const positions = portfolio.filter((p) => p.instrument.symbol === symbol);
+      const positions = portfolio.positions.filter((p) =>
+        p.instrument.symbol === symbol
+      );
       // Total amount invested in target
-      const invested: Amount = value(positions, tick);
+      const invested: Amount = portfolio.value(tick);
       let pct_invested = invested / total_value * 100;
 
       // Buy additional positions
@@ -77,8 +75,10 @@ export function randomTrading(
     const orders: Order[] = [];
 
     // 20% chance of closing a position
-    if (portfolio.length > 0 && Math.random() < chance) {
-      const position = portfolio[Math.floor(Math.random() * portfolio.length)];
+    if (portfolio.positions.length > 0 && Math.random() < chance) {
+      const position =
+        portfolio
+          .positions[Math.floor(Math.random() * portfolio.positions.length)];
       orders.push({
         position,
         reason: "Close",
@@ -90,9 +90,7 @@ export function randomTrading(
       const index = Math.floor(Math.random() * instruments.length);
       const instrument = instruments[index];
       // Value of portfolio
-      const equity: Amount = portfolio.map((p: OpenPosition) => p.value(tick))
-        .reduce((a, b) => a + b, 0);
-
+      const equity: Amount = portfolio.value(tick);
       const total = equity + cash;
       // Spend 10% of total value in each new position
       const amount = total * ratio;

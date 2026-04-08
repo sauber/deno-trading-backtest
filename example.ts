@@ -24,7 +24,7 @@ console.log(linechart(value, 15, 72));
 // Display open positions
 const table = new Table();
 table.headers = ["Symbol", "Open", "Value"];
-table.rows = simulation.positions.map((
+table.rows = simulation.portfolio.positions.map((
   p,
 ) => [
   p.instrument.symbol,

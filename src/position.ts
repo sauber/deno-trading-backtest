@@ -4,8 +4,6 @@ import type { Tick } from "./series.ts";
 /** Amount of money */
 export type Amount = number;
 
-/** Instruments available for trading */
-
 /** Position opened  */
 export class OpenPosition {
   constructor(
@@ -15,6 +13,7 @@ export class OpenPosition {
     public readonly invested: Amount,
   ) {}
 
+  /** Value of position at tick */
   public value(tick: Tick): Amount {
     return this.quantity * this.instrument.price(tick);
   }
@@ -48,22 +47,37 @@ export type ClosingReason =
   | "Trail";
 
 /** Position no longer open */
-export class ClosedPosition extends OpenPosition {
+export class ClosedPosition {
   constructor(
-    instrument: Instrument,
-    quantity: number,
-    start: Tick,
-    invested: Amount,
+    public readonly instrument: Instrument,
+    public readonly quantity: number,
+    public readonly start: Tick,
+    public readonly invested: Amount,
     public readonly end: Tick,
     public readonly reason: ClosingReason,
     public readonly profit: Amount,
-  ) {
-    super(instrument, quantity, start, invested);
-  }
+  ) {}
 }
 
 /** Open or closed Position */
 export type Position = OpenPosition | ClosedPosition;
 
 /** List of open positions */
-export type Portfolio = Array<OpenPosition>;
+export class Portfolio {
+  constructor(public readonly positions: OpenPosition[] = []) {}
+
+  /** Add positions to portfolio */
+  public add(position: OpenPosition): void {
+    this.positions.push(position);
+  }
+
+  /** Remove positions from portfolio */
+  public remove(position: OpenPosition): void {
+    this.positions.splice(this.positions.indexOf(position), 1);
+  }
+
+  /** Value of all positions */
+  public value(tick: Tick): Amount {
+    return this.positions.map((p) => p.value(tick)).reduce((a, b) => a + b, 0);
+  }
+}
