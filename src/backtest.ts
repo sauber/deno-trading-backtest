@@ -1,15 +1,15 @@
 import type { Market } from "./market.ts";
 import {
   type Amount,
+  type ClosedPosition,
   OpenPosition,
   Portfolio,
-  type Position,
 } from "./position.ts";
 import type { Series, Tick } from "./series.ts";
 import type { BuyOrder, Order, SellOrder, Strategy } from "./strategy.ts";
 
 /** History of positions opened of closed*/
-export type Transactions = Array<Position>;
+export type Transactions = Array<ClosedPosition>;
 
 /** Run simulation using strategy */
 export class Backtest {
