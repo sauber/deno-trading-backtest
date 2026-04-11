@@ -17,8 +17,8 @@
     ]
   },
   "imports": {
-    "@sauber/statistics": "jsr:@sauber/statistics@^0.4.0",
-    "@std/assert": "jsr:@std/assert@^1.0.13",
-    "nanoid": "npm:nanoid@^5.0.9"
+    "@sauber/statistics": "jsr:@sauber/statistics@^0.5.0",
+    "@std/assert": "jsr:@std/assert@^1.0.19",
+    "nanoid": "npm:nanoid@^5.1.7"
   }
 }
