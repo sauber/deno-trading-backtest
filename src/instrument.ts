@@ -44,4 +44,17 @@ export class Instrument {
     }
     return this.series[tick - this.start];
   }
+
+  /** Instrument with slice of series */
+  public slice(start: Tick, end: Tick = this.end): Instrument {
+    if (start < this.start || end > this.end) {
+      throw new Error(
+        `Error: Slice range [${start};${end}] is outside range [${this.start};${this.end}] of instrument ${this.symbol}.`,
+      );
+    }
+    const slicedSeries = this.series.slice(start - this.start, end - this.start + 1);
+    const symbol = `${this.symbol}[${start};${end}]`;
+    return new Instrument(slicedSeries, start, symbol, this.name);
+  }
+
 }
